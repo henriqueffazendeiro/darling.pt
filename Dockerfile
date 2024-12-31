@@ -11,11 +11,5 @@ RUN npm install
 # Copy all project files
 COPY . .
 
-# Set environment variable (without quotes, as a plain integer)
-ENV PORT 3000
-
-# Expose the same port
-EXPOSE 3000
-
 # Start the application
 CMD ["npm", "start"]
