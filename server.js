@@ -4,7 +4,6 @@ const nodemailer = require('nodemailer');
 const QRCode = require('qrcode');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const mongoose = require('mongoose');
-const path = require('path');
 
 // Configuração do transporter logo no início
 const transporter = nodemailer.createTransport({
@@ -133,6 +132,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) =
 // Middleware global para outras rotas (após o webhook)
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.static('public'));
 
 // Rota para criar sessão de checkout do Stripe
 app.post('/create-checkout-session', async (req, res) => {
@@ -253,7 +253,7 @@ app.post('/save-page-data', express.json(), async (req, res) => {
     }
 });
 
-// MOVER: Rota específica para página-criada deve vir ANTES dos arquivos estáticos
+// Rota para servir a página personalizada
 app.get('/pagina-criada/:sessionId', async (req, res) => {
     try {
         const page = await Page.findOne({ sessionId: req.params.sessionId });
@@ -443,11 +443,6 @@ app.get('/pagina-criada/:sessionId', async (req, res) => {
     }
 });
 
-// DEPOIS: Servir arquivos estáticos
-app.use('/assets', express.static(path.join(__dirname, 'public/assets')));
-app.use('/css', express.static(path.join(__dirname, 'public/css')));
-app.use('/js', express.static(path.join(__dirname, 'public/js')));
-
 app.get('/couples/:id', async (req, res) => {
     try {
         const pageData = await db.collection('pages').findOne({ _id: req.params.id });
@@ -469,20 +464,6 @@ app.post('/checkout-success', async (req, res) => {
     const pageId = result.insertedId;
     
     res.redirect(`/couples/${pageId}`);
-});
-
-// MODIFICAR: Rota raiz para redirecionar para página correta
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index.html'));
-});
-
-// ÚLTIMO: Rota fallback
-app.get('*', (req, res) => {
-    if (req.url.startsWith('/pagina-criada/')) {
-        const sessionId = req.url.split('/pagina-criada/')[1];
-        return res.redirect(`/pagina-criada/${sessionId}`);
-    }
-    res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 // Inicia o servidor
