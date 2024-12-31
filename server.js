@@ -254,7 +254,7 @@ app.post('/save-page-data', express.json(), async (req, res) => {
     }
 });
 
-// Rota para servir a página personalizada
+// MOVER: Rota específica para página-criada deve vir ANTES dos arquivos estáticos
 app.get('/pagina-criada/:sessionId', async (req, res) => {
     try {
         const page = await Page.findOne({ sessionId: req.params.sessionId });
@@ -444,6 +444,9 @@ app.get('/pagina-criada/:sessionId', async (req, res) => {
     }
 });
 
+// DEPOIS: Servir arquivos estáticos
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.get('/couples/:id', async (req, res) => {
     try {
         const pageData = await db.collection('pages').findOne({ _id: req.params.id });
@@ -467,17 +470,14 @@ app.post('/checkout-success', async (req, res) => {
     res.redirect(`/couples/${pageId}`);
 });
 
-// Servir arquivos estáticos
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Rota raiz
+// MODIFICAR: Rota raiz para redirecionar para página correta
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.redirect('/index.html');
 });
 
-// Rota fallback para SPA (Single Page Application)
+// ÚLTIMO: Rota fallback
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.redirect('/index.html');
 });
 
 // Inicia o servidor
