@@ -485,3 +485,35 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
+
+// 1. Primeiro: Middleware necessário
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// 2. Rota específica para página-criada ANTES dos arquivos estáticos
+app.get('/pagina-criada/:sessionId', async (req, res) => {
+    // ...existing code for pagina-criada route...
+});
+
+// 3. Depois: Arquivos estáticos com opções específicas
+app.use(express.static(path.join(__dirname, 'public'), {
+    index: false // Desabilita o redirecionamento automático para index.html
+}));
+
+// 4. Rota raiz
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// 5. Rota fallback (deve ser a última)
+app.get('*', (req, res) => {
+    // Verifica se a URL começa com /pagina-criada
+    if (req.url.startsWith('/pagina-criada/')) {
+        // Mantém a URL original para páginas criadas
+        const sessionId = req.url.split('/pagina-criada/')[1];
+        res.redirect(`/pagina-criada/${sessionId}`);
+    } else {
+        // Redireciona para index.html apenas outras URLs
+        res.redirect('/');
+    }
+});
