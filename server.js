@@ -4,6 +4,7 @@ const nodemailer = require('nodemailer');
 const QRCode = require('qrcode');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const mongoose = require('mongoose');
+const path = require('path');
 
 // Configuração do transporter logo no início
 const transporter = nodemailer.createTransport({
@@ -464,6 +465,19 @@ app.post('/checkout-success', async (req, res) => {
     const pageId = result.insertedId;
     
     res.redirect(`/couples/${pageId}`);
+});
+
+// Servir arquivos estáticos
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Rota raiz
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Rota fallback para SPA (Single Page Application)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Inicia o servidor
