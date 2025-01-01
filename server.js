@@ -365,7 +365,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     .bubble {z-index: 9999; position: absolute;bottom: -50px;opacity: 0;animation: rise-bubble 5s ease-in-out forwards;}
                     .heart-large {font-size: 60px;left: 75%;animation-delay: 1s;color: red;}
                     .heart-medium {font-size: 50px;left: 42%;animation-delay: 1.5s;color: red;}
-                    .heart-small {font-size: 40px;left: 6%;animation-delay: 0.5s;color: red;}
+                    .heart-small {font-size: 40px;left: 7%;animation-delay: 0.5s;color: red;}
                     .bubble.heart-small {animation-delay: 0.5s;}
                     .bubble.heart-medium {animation-delay: 1.5s;}
                     .bubble.heart-large {animation-delay: 1s;}
@@ -400,6 +400,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     
                     .separator{
                         width: 70%;
+                        margin-top: 10px;
                      }
 
                     .mus{
