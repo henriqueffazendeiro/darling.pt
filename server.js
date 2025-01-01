@@ -123,6 +123,9 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) =
                     <head>
                         <meta charset="utf-8">
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <!-- Add meta tags for Chrome -->
+                        <meta name="google" content="notranslate">
+                        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
                     </head>
                     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
                         <h1 style="color: #2c3e50; text-align: center;">Obrigado por sua compra!</h1>
@@ -131,16 +134,25 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) =
                             <img src="${qrCodeDataURL}" alt="QR Code" style="width: 250px; height: 250px; display: inline-block;"/>
                         </div>
                         <p style="text-align: center; margin-top: 20px;">
-                            <a href="${link}" style="background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Clique aqui para acessar sua página</a>
+                            <a href="googlechrome://${link.replace('https://', '')}" 
+                               style="background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                                Abrir no Chrome
+                            </a>
+                        </p>
+                        <p style="text-align: center; margin-top: 10px;">
+                            <a href="https://www.google.com/chrome/browser/desktop/" 
+                               style="color: #666; font-size: 12px; text-decoration: underline;">
+                                Instalar Google Chrome se necessário
+                            </a>
                         </p>
                         <p style="text-align: center; color: #7f8c8d; margin-top: 20px;">
-                            Ou acesse diretamente este link:<br>
-                            <a href="${link}" style="color: #3498db; word-break: break-all;">${link}</a>
+                            Ou copie e cole no Chrome:<br>
+                            <span style="color: #3498db; word-break: break-all;">${link}</span>
                         </p>
                     </body>
                     </html>
                 `,
-                attachDataUrls: true // Important: enables data URL images
+                attachDataUrls: true
             };
 
             // Enviar email e aguardar resposta
