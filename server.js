@@ -332,52 +332,27 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
         const relationshipDate = page.pageData.startDate?.split('T')[0] || new Date().toISOString().split('T')[0];
         const relationshipTime = page.pageData.startDate?.split('T')[1] || '00:00';
 
-        // Set color-specific headers
-        res.set({
-            'X-UA-Compatible': 'IE=edge,chrome=1',
-            'Content-Security-Policy': "upgrade-insecure-requests",
-            'Color-Profile': 'sRGB'
-        });
-
         res.send(`
             <!DOCTYPE html>
             <html>
             <head>
                 <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
-                <meta name="color-scheme" content="normal">
-                <meta name="theme-color" content="${theme === 'dark' ? '#1f2022' : '#ffffff'}">
-                <meta name="supported-color-schemes" content="normal">
-                <meta name="color-profile" content="sRGB">
                 <style>
-                    :root {
-                        color-scheme: normal;
-                        --background-light: #ffffff;
-                        --background-dark: #1f2022;
-                        --text-light: #000000;
-                        --text-dark: #ffffff;
-                        --heart-color: #ff0000;
-                        --separator-color: rgba(0, 0, 0, 0.12);
-                    }
-
                     body { 
                         margin-top: 35px; 
                         font-family: 'Rubik', sans-serif; 
                         text-align: center; 
-                        background-color: ${theme === 'dark' ? 'var(--background-dark)' : 'var(--background-light)'};
-                        -webkit-font-smoothing: antialiased;
-                        -moz-osx-font-smoothing: grayscale;
-                        color: ${theme === 'dark' ? 'var(--text-dark)' : 'var(--text-light)'};
+                        background-color: ${theme === 'dark' ? '#1f2022' : '#ffffff'};  
                     }
                     
                     .time { 
                         font-size: 4vw; 
                         margin: 4vw 0; 
-                        color: ${theme === 'dark' ? 'var(--text-dark)' : 'var(--text-light)'}; 
+                        color: ${theme === 'dark' ? 'white' : 'black'}; 
                     }
-                    
                     .message { 
-                        color: ${theme === 'dark' ? 'var(--text-dark)' : 'var(--text-light)'}; 
+                        color: ${theme === 'dark' ? '#ffffff' : '#000000'}; 
                         font-size: 4vw; 
                         line-height: 1.4; 
                         max-width: 80%; 
@@ -385,44 +360,58 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         word-wrap: break-word; 
                         overflow-wrap: break-word; 
                     }
-                    
                     .together-text { 
                         font-weight: bold; 
                         margin-right: 1vw; 
-                        color: ${theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'}; 
+                        color: ${theme === 'dark' ? '#ffffffb0' : '#000000b0'}; 
                         font-size: 4vw; 
                     }
-
-                    .bubble {
-                        color: var(--heart-color) !important;
-                        -webkit-text-fill-color: var(--heart-color);
-                    }
+                    @keyframes rise-bubble {0% {bottom: -50px;opacity: 0;transform: translateX(0);}10% {opacity: 1;transform: translateX(-10px);}30% {transform: translateX(10px);}50% {transform: translateX(-6px);}70% {transform: translateX(6px);}90% {opacity: 1;transform: translateX(-0px);}100% {bottom: 100%;opacity: 0;transform: translateX(0px);}}
+                    .bubble {z-index: 9999; position: absolute;bottom: -50px;opacity: 0;animation: rise-bubble 5s ease-in-out forwards;}
+                    .heart-large {font-size: 60px;left: 75%;animation-delay: 1s;color: red;}
+                    .heart-medium {font-size: 50px;left: 42%;animation-delay: 1.5s;color: red;}
+                    .heart-small {font-size: 40px;left: 6%;animation-delay: 0.5s;color: red;}
+                    .bubble.heart-small {animation-delay: 0.5s;}
+                    .bubble.heart-medium {animation-delay: 1.5s;}
+                    .bubble.heart-large {animation-delay: 1s;}
+                    #image-slideshow {
+                            width: 75vw;
+                            height: 110vw;
+                            margin: 4vw auto;
+                            overflow: hidden;
+                            position: relative;
+                            border-radius: 3vw;
+                        }
+                    #image-slideshow img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                            object-position: center;
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            
+                        }
 
                     .preview-heart-emoji {
-                        color: var(--heart-color) !important;
-                        -webkit-text-fill-color: var(--heart-color);
+                        color: #FF0000;
+                        position: relative;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        margin-bottom: 2vw;
+                        font-size: 5vw;
+                        /* Keep any existing styles for vertical positioning */
                     }
-
-                    .separator {
+                    
+                    .separator{
                         width: 70%;
-                        border: none;
-                        border-top: 1px solid var(--separator-color);
-                    }
+                     }
 
-                    /* Ensure consistent rendering across browsers */
-                    * {
-                        -webkit-appearance: none;
-                        -moz-appearance: none;
-                        appearance: none;
+                    .mus{
+                        margin: 6vw auto;
+
                     }
                 </style>
-                <script>
-                    // Try to open in Chrome
-                    if (!/Chrome/.test(navigator.userAgent)) {
-                        const chromeUrl = 'googlechrome://' + window.location.href.replace('https://', '');
-                        window.location.href = chromeUrl;
-                    }
-                </script>
             </head>
             <body>
                     <div id="image-slideshow"></div>
