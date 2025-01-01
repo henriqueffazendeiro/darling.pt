@@ -406,6 +406,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
 
                     .mus{
                         margin: 6vw auto;
+                        margin-top: 30px;
 
                     }
                 </style>
