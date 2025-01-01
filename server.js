@@ -253,10 +253,31 @@ app.post('/save-page-data', express.json(), async (req, res) => {
     }
 });
 
-// Rota para servir a página personalizada
-app.get('/pagina-criada/:sessionId', async (req, res) => {
+// Move this BEFORE all other routes
+app.use(express.static('public'));
+
+// Add this new middleware to handle all routes
+app.use((req, res, next) => {
+    // If the request is for a static file or API endpoint, continue normally
+    if (req.url.startsWith('/api') || req.url.includes('.')) {
+        return next();
+    }
+    // Otherwise, treat it as a potential dynamic route
+    next();
+});
+
+// Update the route to handle both direct and wildcard access
+app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
     try {
-        const page = await Page.findOne({ sessionId: req.params.sessionId });
+        // Extract sessionId from params or from the URL path
+        const sessionId = req.params.sessionId || req.path.split('/').pop();
+        
+        // If no sessionId is found, return 404
+        if (!sessionId) {
+            return res.status(404).send('Página não encontrada');
+        }
+
+        const page = await Page.findOne({ sessionId: sessionId });
         if (!page) {
             return res.status(404).send('Página não encontrada');
         }
