@@ -331,7 +331,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         margin-top: 35px; 
                         font-family: 'Rubik', sans-serif; 
                         text-align: center; 
-                        background-color: ${theme === 'dark' ? '#1f2022' : '#ffffff'};  
+                        background-color: ${theme === 'dark' ? '#37383b' : '#ffffff'};  
                     }
                     
                     .time { 
