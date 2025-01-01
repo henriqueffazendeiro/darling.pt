@@ -425,107 +425,76 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     <div class="message">${message}</div>
                     ${page.pageData.youtubeUrl ? `
                         <div id="youtube-player"></div>
-                        <script src="https://www.youtube.com/iframe_api"></script>
                         <script>
-                            var player;
-                            var isFirstPlay = true;
+                            // Force autoplay with direct iframe first
+                            document.write(\`
+                                <iframe 
+                                    id="youtube-iframe"
+                                    width="100%" 
+                                    height="80" 
+                                    src="https://www.youtube.com/embed/${getYoutubeId(page.pageData.youtubeUrl)}?autoplay=1&mute=0&controls=1&loop=1&playlist=${getYoutubeId(page.pageData.youtubeUrl)}&playsinline=1&enablejsapi=1" 
+                                    allow="autoplay; encrypted-media" 
+                                    allowfullscreen
+                                    style="border: none;">
+                                </iframe>
+                            \`);
 
-                            function createPlayer() {
-                                player = new YT.Player('youtube-player', {
-                                    height: '80',
-                                    width: '100%',
-                                    videoId: '${getYoutubeId(page.pageData.youtubeUrl)}',
-                                    playerVars: {
-                                        'autoplay': 1,
-                                        'mute': 0,
-                                        'controls': 1,
-                                        'loop': 1,
-                                        'playlist': '${getYoutubeId(page.pageData.youtubeUrl)}',
-                                        'playsinline': 1,
-                                        'rel': 0,
-                                        'showinfo': 0,
-                                        'enablejsapi': 1,
-                                        'origin': window.location.origin
-                                    },
+                            // Then load YouTube API for additional control
+                            var tag = document.createElement('script');
+                            tag.src = "https://www.youtube.com/iframe_api";
+                            var firstScriptTag = document.getElementsByTagName('script')[0];
+                            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+                            var player;
+                            function onYouTubeIframeAPIReady() {
+                                player = new YT.Player('youtube-iframe', {
                                     events: {
-                                        'onReady': onPlayerReady,
-                                        'onStateChange': onPlayerStateChange
+                                        'onReady': function(event) {
+                                            event.target.playVideo();
+                                            event.target.unMute();
+                                            event.target.setVolume(100);
+                                            
+                                            // Keep trying to play
+                                            setInterval(() => {
+                                                if (event.target.getPlayerState() !== YT.PlayerState.PLAYING) {
+                                                    event.target.playVideo();
+                                                    event.target.unMute();
+                                                }
+                                            }, 1000);
+                                        },
+                                        'onStateChange': function(event) {
+                                            if (event.data !== YT.PlayerState.PLAYING) {
+                                                event.target.playVideo();
+                                                event.target.unMute();
+                                            }
+                                        }
                                     }
                                 });
                             }
 
-                            function onYouTubeIframeAPIReady() {
-                                createPlayer();
-                            }
-
-                            function onPlayerReady(event) {
-                                // Force unmute and play
-                                event.target.unMute();
-                                event.target.setVolume(100);
-                                event.target.playVideo();
-                                
-                                // Attempt immediate playback
-                                setTimeout(() => {
-                                    if (player && player.getPlayerState() !== YT.PlayerState.PLAYING) {
+                            // Additional autoplay attempts
+                            function forcePlay() {
+                                const iframe = document.getElementById('youtube-iframe');
+                                if (iframe) {
+                                    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                                    if (player && player.playVideo) {
                                         player.playVideo();
+                                        player.unMute();
+                                        player.setVolume(100);
                                     }
-                                }, 100);
-                            }
-
-                            function onPlayerStateChange(event) {
-                                // If video ends or pauses, restart it
-                                if (event.data === YT.PlayerState.ENDED || 
-                                    event.data === YT.PlayerState.PAUSED) {
-                                    player.playVideo();
-                                }
-                                
-                                // If video is buffering, ensure it's unmuted
-                                if (event.data === YT.PlayerState.BUFFERING) {
-                                    player.unMute();
-                                    player.setVolume(100);
                                 }
                             }
 
-                            // Multiple autoplay attempts
-                            function attemptAutoplay() {
-                                if (player && player.playVideo) {
-                                    player.unMute();
-                                    player.setVolume(100);
-                                    player.playVideo();
-                                }
-                            }
+                            // Try multiple times to start playback
+                            window.addEventListener('load', forcePlay);
+                            document.addEventListener('DOMContentLoaded', forcePlay);
+                            setTimeout(forcePlay, 1000);
+                            setTimeout(forcePlay, 2000);
+                            setTimeout(forcePlay, 3000);
 
-                            // Try to start playing as soon as possible
-                            window.addEventListener('load', attemptAutoplay);
-                            document.addEventListener('DOMContentLoaded', attemptAutoplay);
-                            
-                            // Ensure playback continues
-                            setInterval(() => {
-                                if (player && player.getPlayerState && player.getPlayerState() !== YT.PlayerState.PLAYING) {
-                                    attemptAutoplay();
-                                }
-                            }, 1000);
-
-                            // Force play on first interaction
-                            document.addEventListener('click', function() {
-                                attemptAutoplay();
-                            }, { once: true });
-
-                            // Backup iframe approach
-                            setTimeout(() => {
-                                if (!player || player.getPlayerState() !== YT.PlayerState.PLAYING) {
-                                    const container = document.getElementById('youtube-player');
-                                    container.innerHTML = \`
-                                        <iframe 
-                                            width="100%" 
-                                            height="80" 
-                                            src="https://www.youtube.com/embed/${getYoutubeId(page.pageData.youtubeUrl)}?autoplay=1&mute=0&controls=1&loop=1&playlist=${getYoutubeId(page.pageData.youtubeUrl)}&playsinline=1" 
-                                            allow="autoplay; encrypted-media" 
-                                            allowfullscreen>
-                                        </iframe>
-                                    \`;
-                                }
-                            }, 2000);
+                            // Try to play on any user interaction
+                            document.addEventListener('click', forcePlay);
+                            document.addEventListener('touchstart', forcePlay);
                         </script>
                     ` : ''}
 
