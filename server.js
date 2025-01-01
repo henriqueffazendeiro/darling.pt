@@ -429,52 +429,69 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
             id="youtube-player"
             width="100%" 
             height="80" 
-            src="https://www.youtube.com/embed/${getYoutubeId(page.pageData.youtubeUrl)}?enablejsapi=1&autoplay=1&mute=0&controls=1&loop=1&playlist=${getYoutubeId(page.pageData.youtubeUrl)}" 
+            src="https://www.youtube.com/embed/${getYoutubeId(page.pageData.youtubeUrl)}?enablejsapi=1&autoplay=1&mute=0&controls=1&loop=1&playlist=${getYoutubeId(page.pageData.youtubeUrl)}&playsinline=1&origin=${process.env.BASE_URL}" 
+            title="YouTube music player"
             frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen
-            style="margin: 20px auto;">
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; camera; microphone" 
+            allowfullscreen>
         </iframe>
     </div>
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-        var player;
+        let player;
+        let autoplayAttempted = false;
+
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('youtube-player', {
                 events: {
-                    'onReady': onPlayerReady
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
                 }
             });
         }
 
         function onPlayerReady(event) {
-            // Try to play immediately
-            event.target.playVideo();
+            // Immediately try to play
+            playVideo(event.target);
             
-            // Also try to play on first user interaction
-            document.body.addEventListener('click', function() {
-                event.target.playVideo();
+            // Also try to play when user interacts
+            document.addEventListener('click', function() {
+                playVideo(event.target);
             }, { once: true });
         }
 
+        function onPlayerStateChange(event) {
+            // If video pauses unexpectedly, try to resume
+            if (event.data === YT.PlayerState.PAUSED && !autoplayAttempted) {
+                playVideo(event.target);
+            }
+        }
+
+        function playVideo(videoPlayer) {
+            autoplayAttempted = true;
+            videoPlayer.unMute();
+            videoPlayer.playVideo();
+        }
+
         // Additional autoplay attempts
-        window.addEventListener('load', function() {
+        document.addEventListener('DOMContentLoaded', function() {
             if (player && player.playVideo) {
-                player.playVideo();
+                playVideo(player);
             }
         });
 
-        // Retry playing every few seconds for the first minute
-        let attempts = 0;
-        const maxAttempts = 20;
-        const playInterval = setInterval(function() {
-            if (player && player.playVideo && attempts < maxAttempts) {
-                player.playVideo();
-                attempts++;
-            } else {
-                clearInterval(playInterval);
+        window.addEventListener('load', function() {
+            if (player && player.playVideo) {
+                playVideo(player);
             }
-        }, 3000);
+        });
+
+        // Try to play video when tab becomes visible
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && player && player.playVideo) {
+                playVideo(player);
+            }
+        });
     </script>
 ` : ''}
 
