@@ -354,6 +354,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         margin: 0 auto; 
                         word-wrap: break-word; 
                         overflow-wrap: break-word; 
+                        margin-top: 15px;
                     }
                     .together-text { 
                         font-weight: bold; 
