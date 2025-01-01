@@ -435,6 +435,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                                     videoId: '${getYoutubeId(page.pageData.youtubeUrl)}',
                                     playerVars: {
                                         'autoplay': 1,
+                                        'mute': 0,
                                         'controls': 1,
                                         'loop': 1,
                                         'playlist': '${getYoutubeId(page.pageData.youtubeUrl)}',
@@ -443,33 +444,22 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                                         'showinfo': 0
                                     },
                                     events: {
-                                        'onReady': onPlayerReady
+                                        'onReady': function(event) {
+                                            event.target.playVideo();
+                                            event.target.unMute();
+                                            event.target.setVolume(100);
+                                        }
                                     }
                                 });
                             }
 
-                            function onPlayerReady(event) {
-                                event.target.playVideo();
-                                
-                                // Try to unmute and play on first user interaction
-                                document.body.addEventListener('click', function() {
-                                    event.target.unMute();
-                                    event.target.playVideo();
-                                }, { once: true });
-                            }
-
-                            // Additional autoplay attempts
-                            window.addEventListener('load', function() {
-                                if (player && player.playVideo) {
-                                    player.playVideo();
+                            // Force unmute on user interaction
+                            document.addEventListener('click', function() {
+                                if (player && player.unMute) {
+                                    player.unMute();
+                                    player.setVolume(100);
                                 }
-                            });
-
-                            document.addEventListener('DOMContentLoaded', function() {
-                                if (player && player.playVideo) {
-                                    player.playVideo();
-                                }
-                            });
+                            }, { once: true });
                         </script>
                     ` : ''}
 

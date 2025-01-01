@@ -379,6 +379,32 @@
             }
         });
 
+        // Update the YouTube URL input event listener
+        document.getElementById('youtube-url').addEventListener('input', function(e) {
+            const youtubeUrl = e.target.value;
+            const youtubeEmbed = document.getElementById('youtube-embed');
+            
+            if (isValidYoutubeUrl(youtubeUrl)) {
+                const videoId = getYoutubeVideoId(youtubeUrl);
+                if (videoId) {
+                    youtubeEmbed.innerHTML = `
+                        <iframe 
+                            width="100%" 
+                            height="80" 
+                            src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=1&loop=1&playlist=${videoId}&playsinline=1" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    `;
+                    youtubeEmbed.style.display = 'block';
+                }
+            } else {
+                youtubeEmbed.style.display = 'none';
+                youtubeEmbed.innerHTML = '';
+            }
+        });
+
         // Update the price selection function to show/hide YouTube input
         function selectPrice(element, maxPhotos) {
             // ...existing price selection code...
