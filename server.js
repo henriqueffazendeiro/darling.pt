@@ -183,12 +183,21 @@ app.post('/create-checkout-session', async (req, res) => {
 
         const { plan, pageData } = req.body;
         
-        console.log('Parsed data:', { 
-            plan,
-            pageDataExists: !!pageData,
-            pageDataType: typeof pageData,
-            pageData
-        });
+        // Add debug logging for music URL
+        console.log('Music URL received:', pageData?.musicUrl);
+        
+        // Validate and sanitize music URL if present
+        let sanitizedMusicUrl = '';
+        if (plan === 'premium' && pageData.musicUrl) {
+            try {
+                sanitizedMusicUrl = pageData.musicUrl.toString().trim();
+                // Validate URL format
+                new URL(sanitizedMusicUrl);
+            } catch (e) {
+                console.error('Invalid music URL:', e);
+                sanitizedMusicUrl = ''; // Clear invalid URL
+            }
+        }
 
         if (!plan || (plan !== 'basic' && plan !== 'premium')) {
             throw new Error('Plano inválido ou ausente.');
@@ -200,7 +209,7 @@ app.post('/create-checkout-session', async (req, res) => {
 
         const price = plan === 'premium' ? 1000 : 500;
 
-        // Create Stripe session
+        // Create Stripe session with modified metadata
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [{
@@ -208,6 +217,7 @@ app.post('/create-checkout-session', async (req, res) => {
                     currency: 'usd',
                     product_data: {
                         name: `Plano ${plan.charAt(0).toUpperCase() + plan.slice(1)}`,
+                        description: plan === 'premium' ? 'Plano Premium com música' : 'Plano Básico',
                     },
                     unit_amount: price,
                 },
@@ -227,16 +237,13 @@ app.post('/create-checkout-session', async (req, res) => {
             compressedImages = pageData.images.map(img => compressImageData(img));
         }
 
-        // Save page data with compressed images
+        // Save page data with sanitized music URL
         const page = new Page({
             sessionId: session.id,
             pageData: {
-                coupleNames: pageData.coupleNames,
-                startDate: pageData.startDate,
-                message: pageData.message,
-                theme: pageData.theme,
+                ...pageData,
                 images: compressedImages,
-                musicUrl: compressImageData(pageData.musicUrl)
+                musicUrl: sanitizedMusicUrl || pageData.musicUrl, // Use sanitized URL or original if sanitization failed
             }
         });
 
@@ -246,7 +253,10 @@ app.post('/create-checkout-session', async (req, res) => {
         res.json({ id: session.id, url: session.url });
     } catch (error) {
         console.error('Checkout session error:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ 
+            error: error.message,
+            details: 'Erro ao criar sessão de checkout'
+        });
     }
 });
 
