@@ -332,6 +332,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
             <html>
             <head>
                 <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet">
+                <link href="/loading.css" rel="stylesheet">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <style>
                     body { 
@@ -416,6 +417,9 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                 </style>
             </head>
             <body>
+                    <div class="loading-container">
+                        <div class="heart-3d"></div>
+                    </div>
                     <div id="image-slideshow"></div>
                     <span class="together-text">Juntos há</span>
                     <div class="time" id="love-time"></div>
@@ -506,6 +510,13 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     ` : ''}
 
                     <script>
+                        // Add this to the beginning of your script section
+                        window.addEventListener('load', function() {
+                            setTimeout(function() {
+                                document.querySelector('.loading-container').classList.add('fade-out');
+                            }, 2000); // Show loading for 2 seconds
+                        });
+
                         function updateLoveTime() {
                             const startDate = new Date("${relationshipDate}T${relationshipTime}");
                             const now = new Date();
