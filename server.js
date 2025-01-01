@@ -424,35 +424,59 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     <hr class="separator">
                     <div class="message">${message}</div>
                     ${page.pageData.youtubeUrl ? `
-                        <iframe 
-                            width="100%" 
-                            height="80" 
-                            src="https://www.youtube.com/embed/${getYoutubeId(page.pageData.youtubeUrl)}?autoplay=1&mute=0&controls=1&loop=1&playlist=${getYoutubeId(page.pageData.youtubeUrl)}&playsinline=1" 
-                            title="YouTube music player"
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen
-                            style="margin: 20px auto;">
-                        </iframe>
-                        <script>
-                            // Try to autoplay the video when page loads
-                            window.addEventListener('load', function() {
-                                const iframe = document.querySelector('iframe');
-                                if (iframe) {
-                                    // Send postMessage to iframe to force autoplay
-                                    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                                }
-                            });
+    <div id="player-container">
+        <iframe 
+            id="youtube-player"
+            width="100%" 
+            height="80" 
+            src="https://www.youtube.com/embed/${getYoutubeId(page.pageData.youtubeUrl)}?enablejsapi=1&autoplay=1&mute=0&controls=1&loop=1&playlist=${getYoutubeId(page.pageData.youtubeUrl)}" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen
+            style="margin: 20px auto;">
+        </iframe>
+    </div>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtube-player', {
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
 
-                            // Try to autoplay when user interacts with the page
-                            document.body.addEventListener('click', function() {
-                                const iframe = document.querySelector('iframe');
-                                if (iframe) {
-                                    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                                }
-                            }, { once: true });
-                        </script>
-                    ` : ''}
+        function onPlayerReady(event) {
+            // Try to play immediately
+            event.target.playVideo();
+            
+            // Also try to play on first user interaction
+            document.body.addEventListener('click', function() {
+                event.target.playVideo();
+            }, { once: true });
+        }
+
+        // Additional autoplay attempts
+        window.addEventListener('load', function() {
+            if (player && player.playVideo) {
+                player.playVideo();
+            }
+        });
+
+        // Retry playing every few seconds for the first minute
+        let attempts = 0;
+        const maxAttempts = 20;
+        const playInterval = setInterval(function() {
+            if (player && player.playVideo && attempts < maxAttempts) {
+                player.playVideo();
+                attempts++;
+            } else {
+                clearInterval(playInterval);
+            }
+        }, 3000);
+    </script>
+` : ''}
 
                     <script>
                         function updateLoveTime() {
