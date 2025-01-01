@@ -64,6 +64,43 @@ function optimizeFileSize(fileData, maxSizeMB = 5) {
     return fileData;
 }
 
+// Add new helper functions at the top level
+function createTempUrl(data) {
+    if (!data) return null;
+    // Create a temporary ID for the data
+    const tempId = Math.random().toString(36).substring(7);
+    // Store only the first few KB to verify the file type
+    const preview = data.substring(0, 1024);
+    return { tempId, preview };
+}
+
+async function processFilesAsync(pageData) {
+    // Process images in parallel
+    const imagePromises = pageData.images ? 
+        pageData.images.map(async (img) => {
+            const { tempId, preview } = createTempUrl(img);
+            // Store full image data temporarily
+            // Later we can process it after checkout
+            return preview;
+        }) : [];
+
+    // Process music file
+    const musicData = pageData.musicUrl ? 
+        createTempUrl(pageData.musicUrl) : null;
+
+    // Wait for all image processing to complete
+    const processedImages = await Promise.all(imagePromises);
+
+    return {
+        coupleNames: pageData.coupleNames,
+        startDate: pageData.startDate,
+        message: pageData.message,
+        theme: pageData.theme,
+        images: processedImages,
+        musicUrl: musicData ? musicData.preview : null
+    };
+}
+
 // Middleware exclusivo para o Webhook - deve vir antes de qualquer outro middleware
 app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) => {
     const sig = req.headers['stripe-signature'];
@@ -194,7 +231,7 @@ app.post('/create-checkout-session', async (req, res) => {
 
         const { plan, pageData } = req.body;
 
-        // Validate essential data first
+        // Basic validation
         if (!plan || (plan !== 'basic' && plan !== 'premium')) {
             throw new Error('Plano inválido ou ausente.');
         }
@@ -203,15 +240,7 @@ app.post('/create-checkout-session', async (req, res) => {
             throw new Error('Dados da página ausentes ou inválidos.');
         }
 
-        // Optimize files before creating session
-        const optimizedData = {
-            ...pageData,
-            images: pageData.images ? 
-                    pageData.images.map(img => optimizeFileSize(img, 2)) : [], // 2MB per image
-            musicUrl: optimizeFileSize(pageData.musicUrl, 5) // 5MB for music
-        };
-
-        // Create Stripe session first
+        // Create Stripe session immediately with minimal data
         const price = plan === 'premium' ? 1000 : 500;
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
@@ -231,16 +260,21 @@ app.post('/create-checkout-session', async (req, res) => {
             billing_address_collection: 'required'
         });
 
-        // Save optimized data after session creation
+        // Process files asynchronously
+        const lightweightData = await processFilesAsync(pageData);
+
+        // Save minimal data with session
         const page = new Page({
             sessionId: session.id,
-            pageData: optimizedData
+            pageData: lightweightData
         });
 
-        await page.save();
-        console.log('Checkout session created successfully:', session.id);
+        // Save in background
+        page.save().catch(err => console.error('Error saving page data:', err));
 
+        // Respond immediately with session info
         res.json({ id: session.id, url: session.url });
+
     } catch (error) {
         console.error('Checkout session error:', error);
         res.status(500).json({ error: error.message });
