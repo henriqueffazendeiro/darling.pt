@@ -400,7 +400,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     
                     .separator{
                         width: 70%;
-                        margin-top: 10px;
+                        margin-top: 15px;
                      }
 
                     .mus{
