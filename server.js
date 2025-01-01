@@ -424,76 +424,35 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     <hr class="separator">
                     <div class="message">${message}</div>
                     ${page.pageData.youtubeUrl ? `
-    <div id="player-container">
-        <iframe 
-            id="youtube-player"
-            width="100%" 
-            height="80" 
-            src="https://www.youtube.com/embed/${getYoutubeId(page.pageData.youtubeUrl)}?enablejsapi=1&autoplay=1&mute=0&controls=1&loop=1&playlist=${getYoutubeId(page.pageData.youtubeUrl)}&playsinline=1&origin=${process.env.BASE_URL}" 
-            title="YouTube music player"
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; camera; microphone" 
-            allowfullscreen>
-        </iframe>
-    </div>
-    <script src="https://www.youtube.com/iframe_api"></script>
-    <script>
-        let player;
-        let autoplayAttempted = false;
+                        <iframe 
+                            width="100%" 
+                            height="80" 
+                            src="https://www.youtube.com/embed/${getYoutubeId(page.pageData.youtubeUrl)}?autoplay=1&mute=0&controls=1&loop=1&playlist=${getYoutubeId(page.pageData.youtubeUrl)}&playsinline=1" 
+                            title="YouTube music player"
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen
+                            style="margin: 20px auto;">
+                        </iframe>
+                        <script>
+                            // Try to autoplay the video when page loads
+                            window.addEventListener('load', function() {
+                                const iframe = document.querySelector('iframe');
+                                if (iframe) {
+                                    // Send postMessage to iframe to force autoplay
+                                    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                                }
+                            });
 
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('youtube-player', {
-                events: {
-                    'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange
-                }
-            });
-        }
-
-        function onPlayerReady(event) {
-            // Immediately try to play
-            playVideo(event.target);
-            
-            // Also try to play when user interacts
-            document.addEventListener('click', function() {
-                playVideo(event.target);
-            }, { once: true });
-        }
-
-        function onPlayerStateChange(event) {
-            // If video pauses unexpectedly, try to resume
-            if (event.data === YT.PlayerState.PAUSED && !autoplayAttempted) {
-                playVideo(event.target);
-            }
-        }
-
-        function playVideo(videoPlayer) {
-            autoplayAttempted = true;
-            videoPlayer.unMute();
-            videoPlayer.playVideo();
-        }
-
-        // Additional autoplay attempts
-        document.addEventListener('DOMContentLoaded', function() {
-            if (player && player.playVideo) {
-                playVideo(player);
-            }
-        });
-
-        window.addEventListener('load', function() {
-            if (player && player.playVideo) {
-                playVideo(player);
-            }
-        });
-
-        // Try to play video when tab becomes visible
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden && player && player.playVideo) {
-                playVideo(player);
-            }
-        });
-    </script>
-` : ''}
+                            // Try to autoplay when user interacts with the page
+                            document.body.addEventListener('click', function() {
+                                const iframe = document.querySelector('iframe');
+                                if (iframe) {
+                                    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                                }
+                            }, { once: true });
+                        </script>
+                    ` : ''}
 
                     <script>
                         function updateLoveTime() {
