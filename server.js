@@ -424,33 +424,52 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     <hr class="separator">
                     <div class="message">${message}</div>
                     ${page.pageData.youtubeUrl ? `
-                        <iframe 
-                            width="100%" 
-                            height="80" 
-                            src="https://www.youtube.com/embed/${getYoutubeId(page.pageData.youtubeUrl)}?autoplay=1&mute=0&controls=1&loop=1&playlist=${getYoutubeId(page.pageData.youtubeUrl)}&playsinline=1" 
-                            title="YouTube music player"
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen
-                            style="margin: 20px auto;">
-                        </iframe>
+                        <div id="youtube-player"></div>
+                        <script src="https://www.youtube.com/iframe_api"></script>
                         <script>
-                            // Try to autoplay the video when page loads
+                            var player;
+                            function onYouTubeIframeAPIReady() {
+                                player = new YT.Player('youtube-player', {
+                                    height: '80',
+                                    width: '100%',
+                                    videoId: '${getYoutubeId(page.pageData.youtubeUrl)}',
+                                    playerVars: {
+                                        'autoplay': 1,
+                                        'controls': 1,
+                                        'loop': 1,
+                                        'playlist': '${getYoutubeId(page.pageData.youtubeUrl)}',
+                                        'playsinline': 1,
+                                        'rel': 0,
+                                        'showinfo': 0
+                                    },
+                                    events: {
+                                        'onReady': onPlayerReady
+                                    }
+                                });
+                            }
+
+                            function onPlayerReady(event) {
+                                event.target.playVideo();
+                                
+                                // Try to unmute and play on first user interaction
+                                document.body.addEventListener('click', function() {
+                                    event.target.unMute();
+                                    event.target.playVideo();
+                                }, { once: true });
+                            }
+
+                            // Additional autoplay attempts
                             window.addEventListener('load', function() {
-                                const iframe = document.querySelector('iframe');
-                                if (iframe) {
-                                    // Send postMessage to iframe to force autoplay
-                                    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                                if (player && player.playVideo) {
+                                    player.playVideo();
                                 }
                             });
 
-                            // Try to autoplay when user interacts with the page
-                            document.body.addEventListener('click', function() {
-                                const iframe = document.querySelector('iframe');
-                                if (iframe) {
-                                    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                            document.addEventListener('DOMContentLoaded', function() {
+                                if (player && player.playVideo) {
+                                    player.playVideo();
                                 }
-                            }, { once: true });
+                            });
                         </script>
                     ` : ''}
 
