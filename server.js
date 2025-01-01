@@ -428,10 +428,9 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         <script src="https://www.youtube.com/iframe_api"></script>
                         <script>
                             var player;
-                            var attempts = 0;
-                            var maxAttempts = 5;
+                            var isFirstPlay = true;
 
-                            function onYouTubeIframeAPIReady() {
+                            function createPlayer() {
                                 player = new YT.Player('youtube-player', {
                                     height: '80',
                                     width: '100%',
@@ -450,34 +449,45 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                                     },
                                     events: {
                                         'onReady': onPlayerReady,
-                                        'onStateChange': onPlayerStateChange,
-                                        'onError': onPlayerError
+                                        'onStateChange': onPlayerStateChange
                                     }
                                 });
                             }
 
+                            function onYouTubeIframeAPIReady() {
+                                createPlayer();
+                            }
+
                             function onPlayerReady(event) {
+                                // Force unmute and play
                                 event.target.unMute();
                                 event.target.setVolume(100);
-                                playVideo();
+                                event.target.playVideo();
+                                
+                                // Attempt immediate playback
+                                setTimeout(() => {
+                                    if (player && player.getPlayerState() !== YT.PlayerState.PLAYING) {
+                                        player.playVideo();
+                                    }
+                                }, 100);
                             }
 
                             function onPlayerStateChange(event) {
+                                // If video ends or pauses, restart it
                                 if (event.data === YT.PlayerState.ENDED || 
                                     event.data === YT.PlayerState.PAUSED) {
-                                    playVideo();
+                                    player.playVideo();
+                                }
+                                
+                                // If video is buffering, ensure it's unmuted
+                                if (event.data === YT.PlayerState.BUFFERING) {
+                                    player.unMute();
+                                    player.setVolume(100);
                                 }
                             }
 
-                            function onPlayerError(event) {
-                                console.log('Player error:', event);
-                                if (attempts < maxAttempts) {
-                                    attempts++;
-                                    setTimeout(playVideo, 1000);
-                                }
-                            }
-
-                            function playVideo() {
+                            // Multiple autoplay attempts
+                            function attemptAutoplay() {
                                 if (player && player.playVideo) {
                                     player.unMute();
                                     player.setVolume(100);
@@ -485,18 +495,37 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                                 }
                             }
 
-                            // Multiple attempts to ensure playback
-                            document.addEventListener('DOMContentLoaded', playVideo);
-                            window.addEventListener('load', playVideo);
-                            document.addEventListener('click', playVideo);
-                            document.addEventListener('touchstart', playVideo);
-
-                            // Periodic check to ensure video keeps playing
-                            setInterval(function() {
-                                if (player && player.getPlayerState() !== YT.PlayerState.PLAYING) {
-                                    playVideo();
+                            // Try to start playing as soon as possible
+                            window.addEventListener('load', attemptAutoplay);
+                            document.addEventListener('DOMContentLoaded', attemptAutoplay);
+                            
+                            // Ensure playback continues
+                            setInterval(() => {
+                                if (player && player.getPlayerState && player.getPlayerState() !== YT.PlayerState.PLAYING) {
+                                    attemptAutoplay();
                                 }
-                            }, 5000);
+                            }, 1000);
+
+                            // Force play on first interaction
+                            document.addEventListener('click', function() {
+                                attemptAutoplay();
+                            }, { once: true });
+
+                            // Backup iframe approach
+                            setTimeout(() => {
+                                if (!player || player.getPlayerState() !== YT.PlayerState.PLAYING) {
+                                    const container = document.getElementById('youtube-player');
+                                    container.innerHTML = \`
+                                        <iframe 
+                                            width="100%" 
+                                            height="80" 
+                                            src="https://www.youtube.com/embed/${getYoutubeId(page.pageData.youtubeUrl)}?autoplay=1&mute=0&controls=1&loop=1&playlist=${getYoutubeId(page.pageData.youtubeUrl)}&playsinline=1" 
+                                            allow="autoplay; encrypted-media" 
+                                            allowfullscreen>
+                                        </iframe>
+                                    \`;
+                                }
+                            }, 2000);
                         </script>
                     ` : ''}
 
