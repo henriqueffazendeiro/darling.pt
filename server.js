@@ -411,7 +411,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     }
 
                     #youtube-iframe{
-                        margin-top: 30px;
+                        margin-top: 60px;
                     }
                 </style>
             </head>
