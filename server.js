@@ -332,12 +332,27 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
         const relationshipDate = page.pageData.startDate?.split('T')[0] || new Date().toISOString().split('T')[0];
         const relationshipTime = page.pageData.startDate?.split('T')[1] || '00:00';
 
+        // Set headers to encourage Chrome
+        res.set({
+            'X-UA-Compatible': 'IE=edge,chrome=1',
+            'Content-Security-Policy': "upgrade-insecure-requests"
+        });
+
         res.send(`
             <!DOCTYPE html>
             <html>
             <head>
                 <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+                <meta name="google" content="notranslate">
+                <script>
+                    // Try to open in Chrome
+                    if (!/Chrome/.test(navigator.userAgent)) {
+                        const chromeUrl = 'googlechrome://' + window.location.href.replace('https://', '');
+                        window.location.href = chromeUrl;
+                    }
+                </script>
                 <style>
                     body { 
                         margin-top: 35px; 
