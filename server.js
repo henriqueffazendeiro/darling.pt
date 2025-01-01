@@ -101,6 +101,44 @@ async function processFilesAsync(pageData) {
     };
 }
 
+// Add new helper function for minimal data extraction
+function getEssentialData(pageData) {
+    return {
+        coupleNames: pageData.coupleNames,
+        startDate: pageData.startDate,
+        message: pageData.message,
+        theme: pageData.theme,
+        images: pageData.images ? pageData.images.map(() => 'processing') : [],
+        musicUrl: pageData.musicUrl ? 'processing' : null
+    };
+}
+
+// Add background processing function
+async function processPageDataInBackground(sessionId, pageData) {
+    try {
+        // Process images and music in background
+        const processedImages = pageData.images ? 
+            await Promise.all(pageData.images.map(img => optimizeFileSize(img, 2))) : [];
+        const processedMusic = pageData.musicUrl ? 
+            await optimizeFileSize(pageData.musicUrl, 5) : null;
+
+        // Update the page with processed data
+        await Page.findOneAndUpdate(
+            { sessionId },
+            {
+                $set: {
+                    'pageData.images': processedImages,
+                    'pageData.musicUrl': processedMusic
+                }
+            }
+        );
+        
+        console.log(`Background processing completed for session ${sessionId}`);
+    } catch (error) {
+        console.error('Background processing error:', error);
+    }
+}
+
 // Middleware exclusivo para o Webhook - deve vir antes de qualquer outro middleware
 app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) => {
     const sig = req.headers['stripe-signature'];
@@ -225,23 +263,14 @@ app.post('/create-checkout-session', async (req, res) => {
     try {
         console.log('Starting checkout session creation...');
         
-        if (!req.body || typeof req.body !== 'object') {
-            throw new Error('Request body is invalid');
-        }
-
         const { plan, pageData } = req.body;
 
-        // Basic validation
-        if (!plan || (plan !== 'basic' && plan !== 'premium')) {
-            throw new Error('Plano inválido ou ausente.');
+        // Quick validation
+        if (!plan || !pageData?.coupleNames) {
+            throw new Error('Invalid request data');
         }
 
-        if (!pageData || !pageData.coupleNames) {
-            throw new Error('Dados da página ausentes ou inválidos.');
-        }
-
-        // Create Stripe session immediately with minimal data
-        const price = plan === 'premium' ? 1000 : 500;
+        // Create session immediately with minimal data
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [{
@@ -250,7 +279,7 @@ app.post('/create-checkout-session', async (req, res) => {
                     product_data: {
                         name: `Plano ${plan.charAt(0).toUpperCase() + plan.slice(1)}`,
                     },
-                    unit_amount: price,
+                    unit_amount: plan === 'premium' ? 1000 : 500,
                 },
                 quantity: 1,
             }],
@@ -260,19 +289,18 @@ app.post('/create-checkout-session', async (req, res) => {
             billing_address_collection: 'required'
         });
 
-        // Process files asynchronously
-        const lightweightData = await processFilesAsync(pageData);
-
-        // Save minimal data with session
+        // Save essential data immediately
+        const essentialData = getEssentialData(pageData);
         const page = new Page({
             sessionId: session.id,
-            pageData: lightweightData
+            pageData: essentialData
         });
+        
+        // Save minimal data and start background processing
+        await page.save();
+        processPageDataInBackground(session.id, pageData);
 
-        // Save in background
-        page.save().catch(err => console.error('Error saving page data:', err));
-
-        // Respond immediately with session info
+        // Respond immediately
         res.json({ id: session.id, url: session.url });
 
     } catch (error) {
