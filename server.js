@@ -331,7 +331,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         margin-top: 35px; 
                         font-family: 'Rubik', sans-serif; 
                         text-align: center; 
-                        background-color: ${theme === 'dark' ? '#37383b' : '#ffffff'};  
+                        background-color: ${theme === 'dark' ? '#1f2022' : '#ffffff'};  
                     }
                     
                     .time { 
@@ -356,8 +356,8 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     }
                     @keyframes rise-bubble {0% {bottom: -50px;opacity: 0;transform: translateX(0);}10% {opacity: 1;transform: translateX(-10px);}30% {transform: translateX(10px);}50% {transform: translateX(-6px);}70% {transform: translateX(6px);}90% {opacity: 1;transform: translateX(-0px);}100% {bottom: 100%;opacity: 0;transform: translateX(0px);}}
                     .bubble {z-index: 9999; position: absolute;bottom: -50px;opacity: 0;animation: rise-bubble 5s ease-in-out forwards;}
-                    .heart-large {font-size: 60px;left: 73%;animation-delay: 1s;color: red;}
-                    .heart-medium {font-size: 50px;left: 40%;animation-delay: 1.5s;color: red;}
+                    .heart-large {font-size: 60px;left: 75%;animation-delay: 1s;color: red;}
+                    .heart-medium {font-size: 50px;left: 42%;animation-delay: 1.5s;color: red;}
                     .heart-small {font-size: 40px;left: 6%;animation-delay: 0.5s;color: red;}
                     .bubble.heart-small {animation-delay: 0.5s;}
                     .bubble.heart-medium {animation-delay: 1.5s;}
