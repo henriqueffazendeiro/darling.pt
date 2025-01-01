@@ -97,8 +97,14 @@
                         </div>
 
                         <div class="music-upload" style="display: none;">
-                            <label for="music-file" class="music-label">Escolher arquivo de música (MP3)</label>
-                            <input type="file" id="music-file" name="music-file" class="music-input" accept=".mp3">
+                            <label for="youtube-url">Link da Música (YouTube)</label>
+                            <input type="url" 
+                                   id="youtube-url" 
+                                   name="youtube-url" 
+                                   class="youtube-input" 
+                                   placeholder="Cole o link do YouTube aqui"
+                                   pattern="^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$">
+                            <small>Ex: https://www.youtube.com/watch?v=XXXX</small>
                         </div>
 
 
@@ -274,7 +280,7 @@
                     startTime: document.getElementById('relationship-time').value,
                     message: document.getElementById('message').value,
                     files: document.getElementById('file-input').files,
-                    musicFile: document.getElementById('music-file').files[0],
+                    youtubeUrl: document.getElementById('youtube-url').value, // Updated this line
                     theme: document.querySelector('.theme-ball.selected').classList.contains('white') ? 'light' : 'dark',
                     plan: document.querySelector('.price-option.selected').getAttribute('data-photos') === '10' ? 'premium' : 'basic'
                 };
@@ -292,17 +298,7 @@
                     Array.from(formData.files).map(file => compressImage(file))
                 );
 
-                // Process music if exists
-                let musicUrl = null;
-                if (formData.musicFile) {
-                    musicUrl = await new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onload = e => resolve(e.target.result);
-                        reader.readAsDataURL(formData.musicFile);
-                    });
-                }
-
-                // Prepare request data
+                // Remove the music file processing section and replace with:
                 const requestData = {
                     plan: formData.plan,
                     pageData: {
@@ -311,7 +307,7 @@
                         message: formData.message,
                         theme: formData.theme,
                         images: images,
-                        musicUrl: musicUrl
+                        youtubeUrl: formData.youtubeUrl // Updated this line
                     }
                 };
 
@@ -344,6 +340,12 @@
                 submitButton.disabled = false;
             }
         });
+
+        // Add function to validate YouTube URL
+        function isValidYoutubeUrl(url) {
+            const pattern = /^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/;
+            return pattern.test(url);
+        }
     </script>
 </body>
 

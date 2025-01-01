@@ -37,7 +37,7 @@ const PageSchema = new mongoose.Schema({
         message: String,
         theme: String,
         images: [String],
-        musicUrl: String
+        youtubeUrl: String  // Changed from musicUrl to youtubeUrl
     },
     createdAt: { type: Date, default: Date.now }
 });
@@ -51,6 +51,13 @@ function compressImageData(imageData) {
         return imageData.substring(0, 1000000);
     }
     return imageData;
+}
+
+// Add this helper function at the top of your file
+function getYoutubeId(url) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
 }
 
 // Middleware exclusivo para o Webhook - deve vir antes de qualquer outro middleware
@@ -224,7 +231,7 @@ app.post('/create-checkout-session', async (req, res) => {
                 message: pageData.message,
                 theme: pageData.theme,
                 images: compressedImages,
-                musicUrl: compressImageData(pageData.musicUrl)
+                youtubeUrl: compressImageData(pageData.youtubeUrl)
             }
         });
 
@@ -253,7 +260,7 @@ app.post('/save-page-data', express.json(), async (req, res) => {
         const compressedData = {
             ...pageData,
             images: compressedImages,
-            musicUrl: compressImageData(pageData.musicUrl)
+            youtubeUrl: compressImageData(pageData.youtubeUrl)
         };
 
         // Verificar se já existe uma página com este sessionId
@@ -316,7 +323,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
         }
 
         // Get the required data from pageData
-        const { theme = 'light', message = '', musicUrl = '', images = [] } = page.pageData;
+        const { theme = 'light', message = '', youtubeUrl = '', images = [] } = page.pageData;
         const relationshipDate = page.pageData.startDate?.split('T')[0] || new Date().toISOString().split('T')[0];
         const relationshipTime = page.pageData.startDate?.split('T')[1] || '00:00';
 
@@ -416,7 +423,16 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
 
                     <hr class="separator">
                     <div class="message">${message}</div>
-                    ${musicUrl ? `<audio class="mus" controls autoplay loop src="${page.pageData.musicUrl}"></audio>` : ''}
+                    ${page.pageData.youtubeUrl ? `
+                        <iframe 
+                            width="100%" 
+                            height="80" 
+                            src="https://www.youtube.com/embed/${getYoutubeId(page.pageData.youtubeUrl)}?autoplay=1&controls=1" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    ` : ''}
 
                     <script>
                         function updateLoveTime() {
