@@ -53,6 +53,17 @@ function compressImageData(imageData) {
     return imageData;
 }
 
+// Add this helper function at the top level
+function optimizeFileSize(fileData, maxSizeMB = 5) {
+    if (!fileData) return null;
+    const maxSize = maxSizeMB * 1024 * 1024; // Convert MB to bytes
+    if (fileData.length > maxSize) {
+        console.warn(`File size exceeds ${maxSizeMB}MB, truncating...`);
+        return fileData.substring(0, maxSize);
+    }
+    return fileData;
+}
+
 // Middleware exclusivo para o Webhook - deve vir antes de qualquer outro middleware
 app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) => {
     const sig = req.headers['stripe-signature'];
@@ -175,30 +186,15 @@ app.use(express.static('public'));
 // Rota para criar sessão de checkout do Stripe
 app.post('/create-checkout-session', async (req, res) => {
     try {
-        console.log('Raw request body:', req.body);
+        console.log('Starting checkout session creation...');
         
         if (!req.body || typeof req.body !== 'object') {
             throw new Error('Request body is invalid');
         }
 
         const { plan, pageData } = req.body;
-        
-        // Add debug logging for music URL
-        console.log('Music URL received:', pageData?.musicUrl);
-        
-        // Validate and sanitize music URL if present
-        let sanitizedMusicUrl = '';
-        if (plan === 'premium' && pageData.musicUrl) {
-            try {
-                sanitizedMusicUrl = pageData.musicUrl.toString().trim();
-                // Validate URL format
-                new URL(sanitizedMusicUrl);
-            } catch (e) {
-                console.error('Invalid music URL:', e);
-                sanitizedMusicUrl = ''; // Clear invalid URL
-            }
-        }
 
+        // Validate essential data first
         if (!plan || (plan !== 'basic' && plan !== 'premium')) {
             throw new Error('Plano inválido ou ausente.');
         }
@@ -207,9 +203,16 @@ app.post('/create-checkout-session', async (req, res) => {
             throw new Error('Dados da página ausentes ou inválidos.');
         }
 
-        const price = plan === 'premium' ? 1000 : 500;
+        // Optimize files before creating session
+        const optimizedData = {
+            ...pageData,
+            images: pageData.images ? 
+                    pageData.images.map(img => optimizeFileSize(img, 2)) : [], // 2MB per image
+            musicUrl: optimizeFileSize(pageData.musicUrl, 5) // 5MB for music
+        };
 
-        // Create Stripe session with modified metadata
+        // Create Stripe session first
+        const price = plan === 'premium' ? 1000 : 500;
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [{
@@ -217,7 +220,6 @@ app.post('/create-checkout-session', async (req, res) => {
                     currency: 'usd',
                     product_data: {
                         name: `Plano ${plan.charAt(0).toUpperCase() + plan.slice(1)}`,
-                        description: plan === 'premium' ? 'Plano Premium com música' : 'Plano Básico',
                     },
                     unit_amount: price,
                 },
@@ -229,34 +231,19 @@ app.post('/create-checkout-session', async (req, res) => {
             billing_address_collection: 'required'
         });
 
-        console.log('Stripe session created:', session.id);
-
-        // Compress images before saving
-        let compressedImages = [];
-        if (pageData.images && Array.isArray(pageData.images)) {
-            compressedImages = pageData.images.map(img => compressImageData(img));
-        }
-
-        // Save page data with sanitized music URL
+        // Save optimized data after session creation
         const page = new Page({
             sessionId: session.id,
-            pageData: {
-                ...pageData,
-                images: compressedImages,
-                musicUrl: sanitizedMusicUrl || pageData.musicUrl, // Use sanitized URL or original if sanitization failed
-            }
+            pageData: optimizedData
         });
 
         await page.save();
-        console.log('Page data saved with sessionId:', session.id);
+        console.log('Checkout session created successfully:', session.id);
 
         res.json({ id: session.id, url: session.url });
     } catch (error) {
         console.error('Checkout session error:', error);
-        res.status(500).json({ 
-            error: error.message,
-            details: 'Erro ao criar sessão de checkout'
-        });
+        res.status(500).json({ error: error.message });
     }
 });
 
