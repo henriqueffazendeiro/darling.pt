@@ -53,92 +53,6 @@ function compressImageData(imageData) {
     return imageData;
 }
 
-// Add this helper function at the top level
-function optimizeFileSize(fileData, maxSizeMB = 5) {
-    if (!fileData) return null;
-    const maxSize = maxSizeMB * 1024 * 1024; // Convert MB to bytes
-    if (fileData.length > maxSize) {
-        console.warn(`File size exceeds ${maxSizeMB}MB, truncating...`);
-        return fileData.substring(0, maxSize);
-    }
-    return fileData;
-}
-
-// Add new helper functions at the top level
-function createTempUrl(data) {
-    if (!data) return null;
-    // Create a temporary ID for the data
-    const tempId = Math.random().toString(36).substring(7);
-    // Store only the first few KB to verify the file type
-    const preview = data.substring(0, 1024);
-    return { tempId, preview };
-}
-
-async function processFilesAsync(pageData) {
-    // Process images in parallel
-    const imagePromises = pageData.images ? 
-        pageData.images.map(async (img) => {
-            const { tempId, preview } = createTempUrl(img);
-            // Store full image data temporarily
-            // Later we can process it after checkout
-            return preview;
-        }) : [];
-
-    // Process music file
-    const musicData = pageData.musicUrl ? 
-        createTempUrl(pageData.musicUrl) : null;
-
-    // Wait for all image processing to complete
-    const processedImages = await Promise.all(imagePromises);
-
-    return {
-        coupleNames: pageData.coupleNames,
-        startDate: pageData.startDate,
-        message: pageData.message,
-        theme: pageData.theme,
-        images: processedImages,
-        musicUrl: musicData ? musicData.preview : null
-    };
-}
-
-// Add new helper function for minimal data extraction
-function getEssentialData(pageData) {
-    return {
-        coupleNames: pageData.coupleNames,
-        startDate: pageData.startDate,
-        message: pageData.message,
-        theme: pageData.theme,
-        images: pageData.images ? pageData.images.map(() => 'processing') : [],
-        musicUrl: pageData.musicUrl ? 'processing' : null
-    };
-}
-
-// Add background processing function
-async function processPageDataInBackground(sessionId, pageData) {
-    try {
-        // Process images and music in background
-        const processedImages = pageData.images ? 
-            await Promise.all(pageData.images.map(img => optimizeFileSize(img, 2))) : [];
-        const processedMusic = pageData.musicUrl ? 
-            await optimizeFileSize(pageData.musicUrl, 5) : null;
-
-        // Update the page with processed data
-        await Page.findOneAndUpdate(
-            { sessionId },
-            {
-                $set: {
-                    'pageData.images': processedImages,
-                    'pageData.musicUrl': processedMusic
-                }
-            }
-        );
-        
-        console.log(`Background processing completed for session ${sessionId}`);
-    } catch (error) {
-        console.error('Background processing error:', error);
-    }
-}
-
 // Middleware exclusivo para o Webhook - deve vir antes de qualquer outro middleware
 app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) => {
     const sig = req.headers['stripe-signature'];
@@ -209,9 +123,6 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) =
                     <head>
                         <meta charset="utf-8">
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <!-- Add meta tags for Chrome -->
-                        <meta name="google" content="notranslate">
-                        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
                     </head>
                     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
                         <h1 style="color: #2c3e50; text-align: center;">Obrigado por sua compra!</h1>
@@ -220,25 +131,16 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) =
                             <img src="${qrCodeDataURL}" alt="QR Code" style="width: 250px; height: 250px; display: inline-block;"/>
                         </div>
                         <p style="text-align: center; margin-top: 20px;">
-                            <a href="googlechrome://${link.replace('https://', '')}" 
-                               style="background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
-                                Abrir no Chrome
-                            </a>
-                        </p>
-                        <p style="text-align: center; margin-top: 10px;">
-                            <a href="https://www.google.com/chrome/browser/desktop/" 
-                               style="color: #666; font-size: 12px; text-decoration: underline;">
-                                Instalar Google Chrome se necessário
-                            </a>
+                            <a href="${link}" style="background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Clique aqui para acessar sua página</a>
                         </p>
                         <p style="text-align: center; color: #7f8c8d; margin-top: 20px;">
-                            Ou copie e cole no Chrome:<br>
-                            <span style="color: #3498db; word-break: break-all;">${link}</span>
+                            Ou acesse diretamente este link:<br>
+                            <a href="${link}" style="color: #3498db; word-break: break-all;">${link}</a>
                         </p>
                     </body>
                     </html>
                 `,
-                attachDataUrls: true
+                attachDataUrls: true // Important: enables data URL images
             };
 
             // Enviar email e aguardar resposta
@@ -261,16 +163,32 @@ app.use(express.static('public'));
 // Rota para criar sessão de checkout do Stripe
 app.post('/create-checkout-session', async (req, res) => {
     try {
-        console.log('Starting checkout session creation...');
+        console.log('Raw request body:', req.body);
         
-        const { plan, pageData } = req.body;
-
-        // Quick validation
-        if (!plan || !pageData?.coupleNames) {
-            throw new Error('Invalid request data');
+        if (!req.body || typeof req.body !== 'object') {
+            throw new Error('Request body is invalid');
         }
 
-        // Create session immediately with minimal data
+        const { plan, pageData } = req.body;
+        
+        console.log('Parsed data:', { 
+            plan,
+            pageDataExists: !!pageData,
+            pageDataType: typeof pageData,
+            pageData
+        });
+
+        if (!plan || (plan !== 'basic' && plan !== 'premium')) {
+            throw new Error('Plano inválido ou ausente.');
+        }
+
+        if (!pageData || !pageData.coupleNames) {
+            throw new Error('Dados da página ausentes ou inválidos.');
+        }
+
+        const price = plan === 'premium' ? 1000 : 500;
+
+        // Create Stripe session
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [{
@@ -279,7 +197,7 @@ app.post('/create-checkout-session', async (req, res) => {
                     product_data: {
                         name: `Plano ${plan.charAt(0).toUpperCase() + plan.slice(1)}`,
                     },
-                    unit_amount: plan === 'premium' ? 1000 : 500,
+                    unit_amount: price,
                 },
                 quantity: 1,
             }],
@@ -289,20 +207,31 @@ app.post('/create-checkout-session', async (req, res) => {
             billing_address_collection: 'required'
         });
 
-        // Save essential data immediately
-        const essentialData = getEssentialData(pageData);
+        console.log('Stripe session created:', session.id);
+
+        // Compress images before saving
+        let compressedImages = [];
+        if (pageData.images && Array.isArray(pageData.images)) {
+            compressedImages = pageData.images.map(img => compressImageData(img));
+        }
+
+        // Save page data with compressed images
         const page = new Page({
             sessionId: session.id,
-            pageData: essentialData
+            pageData: {
+                coupleNames: pageData.coupleNames,
+                startDate: pageData.startDate,
+                message: pageData.message,
+                theme: pageData.theme,
+                images: compressedImages,
+                musicUrl: compressImageData(pageData.musicUrl)
+            }
         });
-        
-        // Save minimal data and start background processing
+
         await page.save();
-        processPageDataInBackground(session.id, pageData);
+        console.log('Page data saved with sessionId:', session.id);
 
-        // Respond immediately
         res.json({ id: session.id, url: session.url });
-
     } catch (error) {
         console.error('Checkout session error:', error);
         res.status(500).json({ error: error.message });
