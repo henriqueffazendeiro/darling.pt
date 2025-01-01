@@ -427,8 +427,9 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         <div id="youtube-player"></div>
                         <script src="https://www.youtube.com/iframe_api"></script>
                         <script>
-                            let player;
-                            let hasInteracted = false;
+                            var player;
+                            var attempts = 0;
+                            var maxAttempts = 5;
 
                             function onYouTubeIframeAPIReady() {
                                 player = new YT.Player('youtube-player', {
@@ -437,80 +438,65 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                                     videoId: '${getYoutubeId(page.pageData.youtubeUrl)}',
                                     playerVars: {
                                         'autoplay': 1,
-                                        'mute': 1, // Start muted to allow autoplay
+                                        'mute': 0,
                                         'controls': 1,
                                         'loop': 1,
                                         'playlist': '${getYoutubeId(page.pageData.youtubeUrl)}',
                                         'playsinline': 1,
                                         'rel': 0,
                                         'showinfo': 0,
-                                        'enablejsapi': 1
+                                        'enablejsapi': 1,
+                                        'origin': window.location.origin
                                     },
                                     events: {
                                         'onReady': onPlayerReady,
-                                        'onStateChange': onPlayerStateChange
+                                        'onStateChange': onPlayerStateChange,
+                                        'onError': onPlayerError
                                     }
                                 });
                             }
 
                             function onPlayerReady(event) {
-                                // Start playing immediately
-                                event.target.playVideo();
-                                
-                                // Try to unmute and play on first interaction
-                                function handleFirstInteraction() {
-                                    if (!hasInteracted) {
-                                        hasInteracted = true;
-                                        player.unMute();
-                                        player.playVideo();
-                                        player.setVolume(100);
-                                    }
-                                    ['click', 'touchstart'].forEach(evt => 
-                                        document.removeEventListener(evt, handleFirstInteraction));
-                                }
-
-                                // Listen for both click and touch events
-                                ['click', 'touchstart'].forEach(evt => 
-                                    document.addEventListener(evt, handleFirstInteraction));
-
-                                // Additional autoplay attempt
-                                setTimeout(() => {
-                                    if (!hasInteracted) {
-                                        player.playVideo();
-                                    }
-                                }, 1000);
+                                event.target.unMute();
+                                event.target.setVolume(100);
+                                playVideo();
                             }
 
                             function onPlayerStateChange(event) {
-                                // If video ends, replay
-                                if (event.data === YT.PlayerState.ENDED) {
-                                    player.playVideo();
+                                if (event.data === YT.PlayerState.ENDED || 
+                                    event.data === YT.PlayerState.PAUSED) {
+                                    playVideo();
                                 }
-                                // If video is paused and hasn't had interaction, resume
-                                if (event.data === YT.PlayerState.PAUSED && !hasInteracted) {
+                            }
+
+                            function onPlayerError(event) {
+                                console.log('Player error:', event);
+                                if (attempts < maxAttempts) {
+                                    attempts++;
+                                    setTimeout(playVideo, 1000);
+                                }
+                            }
+
+                            function playVideo() {
+                                if (player && player.playVideo) {
+                                    player.unMute();
+                                    player.setVolume(100);
                                     player.playVideo();
                                 }
                             }
 
-                            // Additional autoplay attempts
-                            document.addEventListener('DOMContentLoaded', function() {
-                                if (player && player.playVideo) {
-                                    player.playVideo();
-                                }
-                            });
+                            // Multiple attempts to ensure playback
+                            document.addEventListener('DOMContentLoaded', playVideo);
+                            window.addEventListener('load', playVideo);
+                            document.addEventListener('click', playVideo);
+                            document.addEventListener('touchstart', playVideo);
 
-                            window.addEventListener('load', function() {
-                                if (player && player.playVideo) {
-                                    player.playVideo();
-                                    // Try to start unmuted after page load
-                                    setTimeout(() => {
-                                        if (player.unMute) {
-                                            player.unMute();
-                                            player.setVolume(100);
-                                        }
-                                    }, 2000);
+                            // Periodic check to ensure video keeps playing
+                            setInterval(function() {
+                                if (player && player.getPlayerState() !== YT.PlayerState.PLAYING) {
+                                    playVideo();
                                 }
-                            });
+                            }, 5000);
                         </script>
                     ` : ''}
 
