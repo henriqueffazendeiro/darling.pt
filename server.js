@@ -392,7 +392,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     }
                     
                     .separator{
-                        width: 80%;
+                        width: 70%;
                      }
 
                     .mus{
