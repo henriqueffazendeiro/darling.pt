@@ -871,11 +871,11 @@ button[type="submit"]:hover {
     }
 
     .main-title{
-        font-size: 14.2vw;
+        font-size: 14vw;
     }
 
     .subtitle{
-        font-size: 17px;
+        font-size: 15px;
         margin-top: -25px;
         margin-left: 5px;
     }
