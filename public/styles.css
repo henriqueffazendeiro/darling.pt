@@ -863,7 +863,7 @@ button[type="submit"]:hover {
 @media screen and (max-width: 500px) {
 
     .price-selection-container{
-        margin-top: 50px;
+        margin-top: 30px;
     }
 
     .form-container{
