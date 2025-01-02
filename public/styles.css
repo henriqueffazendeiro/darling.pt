@@ -1178,10 +1178,10 @@ button[type="submit"]:hover {
 
 
 
-@media screen and (max-width: 390px) {
+@media screen and (max-width: 370px) {
     .price-option {
         
-        font-size: 11px;
+        font-size: 10px;
       
   
     }
