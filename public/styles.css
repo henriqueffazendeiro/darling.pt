@@ -253,7 +253,7 @@ button[type="submit"]:hover {
     margin-bottom: 5px;
     font-family: rubik;
     color: rgb(0, 0, 0);
-    font-size: 15px;
+    font-size: 13px;
 
 }
 
@@ -328,6 +328,8 @@ button[type="submit"]:hover {
     color: rgb(0, 0, 0);
     
 }
+
+
 
 .music-input:focus {
     border-color: rgb(0, 0, 0);
@@ -891,6 +893,40 @@ button[type="submit"]:hover {
 
     }
 
+    .form-container {
+        max-width: 850px;
+        margin-top: 10px;  /* Reduzido de 50px */
+        border-radius: 8px;
+    }
+    
+    .input-group {
+        justify-content: space-between;
+        margin-bottom: 10px;  /* Reduzido de 15px */
+    }
+    
+    .message-input {
+        margin-top: -10px;  /* Reduzido de 15px */
+    }
+    
+    .file-input-label {
+        margin-top: 00px;  /* Reduzido de 15px */
+    }
+    
+    .music-upload {
+        margin-top: 00px;  /* Reduzido de 20px */
+    }
+    
+    button[type="submit"] {
+        margin-top: 15px;  /* Reduzido de 20px */
+    }
+    
+    .input-group input,
+    .message-input textarea,
+    .file-input-label,
+    .youtube-input {
+        margin-bottom: 8px;  /* Adicionado para consistência */
+    }
+
 
 
 
@@ -1058,13 +1094,13 @@ button[type="submit"]:hover {
     justify-content: center;
     align-items: center;
     background-color: transparent;
-    color: rgb(255, 118, 118);
-    font-family: rubik;
+    color: rgb(0, 0, 0);
+    
     border: 2px solid red;
     margin-top: 15px;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 16px;
+    
     font-weight: bold;
     text-align: center;
     min-height: 44px;
@@ -1075,8 +1111,16 @@ button[type="submit"]:hover {
     box-sizing: border-box;
 }
 
+.youtube-input input{
+    background-color: transparent;
+    color: rgb(0, 0, 0);
+    font-family: rubik;
+
+
+}
+
 .youtube-input::placeholder {
-    color: rgb(255, 118, 118);
+    color: rgb(0, 0, 0);
 }
 
 .youtube-input:focus {
@@ -1126,6 +1170,10 @@ button[type="submit"]:hover {
     .creator-button {
         margin: 0 auto;
     }
+
+
+
+
 }
 
 
