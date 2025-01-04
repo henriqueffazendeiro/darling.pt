@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+        rel="stylesheet">
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .theme-ball {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .theme-ball:hover {
+            transform: scale(1.1);
+        }
+
+        /* Ocultar scrollbar mas manter funcionalidade */
+        .preview-content {
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        .preview-content::-webkit-scrollbar {
+            display: none;
+            /* Chrome, Safari and Opera */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page-container">
+
+        <div class="header">
+
+            <a href="index.html">
+                <img src="logo.png" alt="Logo" class="logo">
+            </a>
+
+
+        </div>
+
+
+        <div class="main-container">
+            <div class="left-column">
+
+                <h1 class="main-title color-fade">Quase lá!</h1>
+                <p class="subtitle">
+                    Preencha os dados para criar a sua página.
+                </p>
+
+                <div class="price-selection-container">
+                    <div class="price-selection">
+                        <div class="price-option selected" id="1" onclick="selectPrice(this, 5)" data-photos="5">
+                            1 ano, 5 fotos, sem música - $5
+                        </div>
+                        <div class="price-option" id="2" onclick="selectPrice(this, 10)" data-photos="10">
+                            Para sempre, 10 fotos, com música - $10
+                        </div>
+                    </div>
+                </div>
+                <div class="form-container">
+                    <form id="couple-form">
+                        <label class="couple_names">Nome do Casal</label>
+
+                        <div class="input-group">
+                            <input class="pp" type="text" id="couple-names" name="couple-names"
+                                placeholder="Rui e Carla (Não use emoji)" required>
+
+                            <input type="date" id="relationship-date" name="relationship-date" required>
+                            <input type="time" id="relationship-time" name="relationship-time" required>
+                        </div>
+
+                        <div class="message-input">
+                            <label for="message">Mensagem</label>
+                            <textarea name="message" id="message" rows="4" required></textarea>
+                        </div>
+
+                        <div class="image-upload">
+                            <label for="file-input" id="photo-label" class="file-input-label">Escolher fotos de casal
+                                (máximo 5)</label>
+                            <input type="file" id="file-input" class="file-input" accept="image/*" multiple>
+                        </div>
+
+                        <div class="music-upload" style="display: none;">
+                            <input type="url" 
+                                   id="youtube-url" 
+                                   name="youtube-url" 
+                                   class="youtube-input" 
+                                   placeholder="Cole o link da música aqui"
+                                   pattern="^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$">
+                        </div>
+
+
+
+                        <button type="submit" id="create-page-button">Criar Nossa Página</button>
+
+
+                    </form>
+                </div>
+                <!-- Your existing content (form, etc.) goes here -->
+            </div>
+            <div class="right-column">
+                <h2 class="preview-heading">Como vai ficar 👇</h2>
+                <div class="preview-container">
+
+                    <div class="preview-tools">
+                        <div class="preview-circle">
+                            <span class="preview-box preview-red"></span>
+                        </div>
+                        <div class="preview-circle">
+                            <span class="preview-box preview-yellow"></span>
+                        </div>
+                        <div class="preview-circle">
+                            <span class="preview-box preview-green"></span>
+                        </div>
+                    </div>
+                    <div class="preview-content">
+
+
+                        <div class="preview-image-container">
+
+                            <img class="preview-image" src="" alt="Preview" onload="handleImageLoad(this)">
+                        </div>
+                        <div class="preview-time-container">
+                            <span class="together-text">Juntos há</span>
+                            <div class="preview-time">
+                                <span id="preview-years">0</span> anos
+                                <span id="preview-months">0</span> meses
+                                <span id="preview-days">0</span> dias
+                                <br>
+                                <span id="preview-hours">0</span> horas
+                                <span id="preview-minutes">0</span> minutos
+                                <span id="preview-seconds">0</span> segundos
+                            </div>
+                        </div>
+
+                        <div class="preview-heart-emoji">
+                            ❤️
+                        </div>
+
+
+                        <hr class="preview-separator">
+
+                        <div class="preview-message-container">
+                            <p id="preview-message" class="preview-message"></p>
+                        </div>
+
+                        <div class="preview-audio-container">
+                            <div id="youtube-embed" style="width: 100%; max-width: 300px; margin: 0 auto;"></div>
+                        </div>
+
+                        <div class="preview-bubbles">
+                            <div class="bubble heart-small">❤️</div>
+                            <div class="bubble heart-medium">❤️</div>
+                            <div class="bubble heart-large">❤️</div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="theme-selector">
+                    <div class="theme-ball black selected"></div>
+                    <div class="theme-ball white"></div>
+                </div>
+
+
+
+                <!-- Your existing preview content goes here -->
+            </div>
+        </div>
+
+
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-left">
+                <img src="logo.png" alt="Logo" class="footer-logo">
+                <p class="footer-tagline">Surpreenda o seu amor criando o seu <br> contador de tempo de
+                    relacionamento</p>
+                <p class="footer-copyright">Copyright © 2024 - Todos os direitos reservados</p>
+                <div class="footer-creator">
+                    <button class="creator-button"
+                        onclick="window.location.href='https://www.instagram.com/f_azendeiro'">
+                        <img src="profile-photo.png" alt="f_azendeiro" class="creator-photo">
+                        <span><strong>Feito por f_azendeiro</strong></span>
+                    </button>
+                </div>
+            </div>
+            <div class="footer-right">
+                <ul class="footer-links">
+                    <li class="i"><strong>Legal</strong></li>
+                    <li><a href="/terms">Termos de uso</a></li>
+                    <li><a href="/privacy">Termos de privacidade</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    </div>
+
+    <!-- Keep the script.js for preview functionality -->
+    <script src="script.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        // Remove any existing event listeners for create-page-button
+        const createPageButton = document.getElementById('create-page-button');
+        const oldCreatePageButton = createPageButton.cloneNode(true);
+        createPageButton.parentNode.replaceChild(oldCreatePageButton, createPageButton);
+
+        const stripe = Stripe('pk_test_51QTKB5Iorl9WgAJnKrTF9kyFvd0qk6nXjZaWjPjBCF9W1POgpooGO1TMWkoN0IiUCXC5TRmZzXdxorRJGFnjfv1x00ehAL8ofA');
+
+        // Function to compress image
+        async function compressImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.onload = function () {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 1024;
+                        const MAX_HEIGHT = 1024;
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            }
+                        } else {
+                            if (height > MAX_HEIGHT) {
+                                width *= MAX_HEIGHT / height;
+                                height = MAX_HEIGHT;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.7));
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        document.getElementById('couple-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const submitButton = document.getElementById('create-page-button');
+            submitButton.disabled = true;
+
+            try {
+                // Collect and validate form data
+                const formData = {
+                    coupleNames: document.getElementById('couple-names').value,
+                    startDate: document.getElementById('relationship-date').value,
+                    startTime: document.getElementById('relationship-time').value,
+                    message: document.getElementById('message').value,
+                    files: document.getElementById('file-input').files,
+                    youtubeUrl: document.getElementById('youtube-url').value, // Updated this line
+                    theme: document.querySelector('.theme-ball.selected').classList.contains('white') ? 'light' : 'dark',
+                    plan: document.querySelector('.price-option.selected').getAttribute('data-photos') === '10' ? 'premium' : 'basic'
+                };
+
+                // Log form data
+                console.log('Form data:', formData);
+
+                // Validate required fields
+                if (!formData.coupleNames || !formData.startDate || !formData.startTime || !formData.message || formData.files.length === 0) {
+                    throw new Error('Por favor, preencha todos os campos obrigatórios e selecione pelo menos uma foto.');
+                }
+
+                // Process and compress images
+                const images = await Promise.all(
+                    Array.from(formData.files).map(file => compressImage(file))
+                );
+
+                // Remove the music file processing section and replace with:
+                const requestData = {
+                    plan: formData.plan,
+                    pageData: {
+                        coupleNames: formData.coupleNames,
+                        startDate: `${formData.startDate}T${formData.startTime}`,
+                        message: formData.message,
+                        theme: formData.theme,
+                        images: images,
+                        youtubeUrl: formData.youtubeUrl // Updated this line
+                    }
+                };
+
+                console.log('Sending request data:', requestData);
+
+                const response = await fetch('/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText);
+                }
+
+                const { id: sessionId } = await response.json();
+                console.log('Session ID:', sessionId);
+
+                const result = await stripe.redirectToCheckout({ sessionId });
+                if (result.error) {
+                    throw new Error(result.error.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message);
+            } finally {
+                submitButton.disabled = false;
+            }
+        });
+
+        // Add function to validate YouTube URL
+        function isValidYoutubeUrl(url) {
+            const pattern = /^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/;
+            return pattern.test(url);
+        }
+
+        // Add these new functions after your existing script
+        function getYoutubeVideoId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        // Add YouTube URL input event listener
+        document.getElementById('youtube-url').addEventListener('input', function(e) {
+            const youtubeUrl = e.target.value;
+            const youtubeEmbed = document.getElementById('youtube-embed');
+            
+            if (isValidYoutubeUrl(youtubeUrl)) {
+                const videoId = getYoutubeVideoId(youtubeUrl);
+                if (videoId) {
+                    youtubeEmbed.innerHTML = `
+                        <iframe 
+                            width="100%" 
+                            height="80" 
+                            src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=1&loop=1&playlist=${videoId}" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    `;
+                    youtubeEmbed.style.display = 'block';
+                }
+            } else {
+                youtubeEmbed.style.display = 'none';
+                youtubeEmbed.innerHTML = '';
+            }
+        });
+
+        // Update the YouTube URL input event listener
+        document.getElementById('youtube-url').addEventListener('input', function(e) {
+            const youtubeUrl = e.target.value;
+            const youtubeEmbed = document.getElementById('youtube-embed');
+            
+            if (isValidYoutubeUrl(youtubeUrl)) {
+                const videoId = getYoutubeVideoId(youtubeUrl);
+                if (videoId) {
+                    youtubeEmbed.innerHTML = `
+                        <iframe 
+                            width="100%" 
+                            height="80" 
+                            src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=1&loop=1&playlist=${videoId}&playsinline=1" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    `;
+                    youtubeEmbed.style.display = 'block';
+                }
+            } else {
+                youtubeEmbed.style.display = 'none';
+                youtubeEmbed.innerHTML = '';
+            }
+        });
+
+        // Update the price selection function to show/hide YouTube input
+        function selectPrice(element, maxPhotos) {
+            // ...existing price selection code...
+            
+            // Show/hide YouTube URL input based on plan
+            const musicUpload = document.querySelector('.music-upload');
+            const youtubeEmbed = document.getElementById('youtube-embed');
+            
+            if (maxPhotos === 10) { // Premium plan
+                musicUpload.style.display = 'block';
+                youtubeEmbed.style.display = 'block';
+            } else {
+                musicUpload.style.display = 'none';
+                youtubeEmbed.style.display = 'none';
+                document.getElementById('youtube-url').value = ''; // Clear URL
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1191 @@
+body {
+    background-color: #f5f5f5;
+    
+    padding-top: 10px;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    line-height: 1.5;
+
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+}
+
+
+.preview-heading {
+    text-align: center;
+    margin-top: -10px;
+    font-size: 1em;
+    font-family: rubik;
+    color: rgb(0, 0, 0);
+}
+
+
+
+
+
+html, body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+
+.page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 0px;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    
+    
+}
+
+.left-column, .right-column {
+    width: 100%;
+    max-width: 850px;
+    margin-left: -30px;
+}
+
+.right-column {
+    margin-right: 0;
+    margin-top: 50px;
+}
+
+@media (min-width: 1250px) {
+
+    .main-container {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 30px 45px;
+        max-width: 1200px;
+        margin: 0 auto;
+        margin-top: -100px;
+    }
+
+    .left-column, .right-column {
+        flex: 0 0 auto;
+    }
+    .right-column {
+        margin-left: 50px;
+    }
+}
+
+
+
+
+
+.logo {
+    max-height: 40px;
+    
+}
+
+.logo{
+
+    margin-top: 40px;
+    margin-left: calc(50% - 610px);
+}
+
+.language-options {
+    position: absolute;
+    display: flex;
+    
+}
+
+.language-option {
+    font-family: monospace;
+    font-size: 15px;
+    padding: 3px 10px;
+    margin-right: 5px;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.language-option.selected {
+    background-color: rgb(255, 0, 43);
+}
+
+.main-title {
+    font-family: rubik;
+    margin-top: 100px;
+    font-size: 69px;
+    line-height: 1.1; /* Add this line to reduce space between lines */
+    color: #ff0000;
+}
+
+
+
+.subtitle {
+    margin-top: -30px;
+    color: rgb(0, 0, 0);
+    font-family: rubik;
+    font-size: 20px;
+    line-height: 1.5;
+}
+
+.price-selection-container {
+    display: flex;
+    
+    margin-top: 60px;
+}
+
+
+
+
+.price-selection {
+    display: flex;
+    border: 2px solid red;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.price-option {
+    font-family: rubik;
+    font-size: 12px;
+    color: rgb(0, 0, 0);
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    background-color: transparent;
+}
+
+.price-option.selected {
+    color: rgb(255, 255, 255);
+    background-color: rgb(255, 47, 47);
+}
+
+
+.form-container {
+    max-width: 850px;
+    
+    margin-top: 50px;
+    border-radius: 8px;
+}
+
+.input-group {
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.input-group input {
+    flex: 1;
+    margin-right: 10px;
+    padding: 10px;
+    border: 2px solid #ff0000;
+    background-color: transparent;
+    color: rgb(0, 0, 0);
+    font-family: rubik;
+    
+    
+    border-radius: 4px;
+}
+
+.input-group input:last-child {
+    margin-right: 0;
+}
+
+
+#couple-names{
+    width: 530px;
+}
+
+
+    
+
+button[type="submit"] {
+    width: 822px;
+    padding: 10px;
+    background-color: #ff0000;
+    color: rgb(255, 255, 255);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: rubik;
+    margin-top: 20px;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+button[type="submit"]:hover {
+    
+    background-color: rgb(255, 216, 216);
+    color: #ff0000;
+}
+
+.couple_names{
+    color: rgb(0, 0, 0);
+    font-size: 13px;
+    font-family: rubik;
+
+}
+
+.relationship_start {
+    display: block;
+    margin-bottom: 5px;
+    color: rgb(0, 0, 0);
+    font-size: 13px;
+    font-family: rubik;
+}
+
+
+
+.message-input {
+    margin-top: 15px;
+}
+
+
+
+.message-input label {
+    display: block;
+    margin-bottom: 5px;
+    font-family: rubik;
+    color: rgb(0, 0, 0);
+    font-size: 13px;
+
+}
+
+.message-input textarea {
+    
+    
+    border: 2px solid #ff0000;
+    border-radius: 4px;
+    resize: vertical;
+    background-color: transparent;
+    width: 813px;
+    height: 200px;
+    color: rgb(0, 0, 0);
+}
+
+
+.file-input-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    color: rgb(255, 118, 118);
+    font-family: rubik;
+    border: 2px solid red;
+    margin-top: 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    min-height: 44px; /* Adjust this value as needed */
+    width: 818px;
+}
+
+
+
+.file-input {
+    display: none;
+}
+
+
+/* Estilo para o campo de link da música */
+.music-label {
+    
+    margin-top: 20px;
+    color: rgb(0, 0, 0);
+    font-size: 14px;
+    font-family: 'Rubik', sans-serif;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.input-group-music {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.music-input {
+    width: 820px;
+    height: 40px;
+    border: 2px solid #ff0000;
+    background-color: transparent;
+    color: #000000;
+    border-radius: 6px;
+    font-family: 'Rubik', sans-serif;
+    font-size: 14px;
+    width: 818px;
+}
+
+.music-input::placeholder {
+    color: rgb(0, 0, 0);
+    
+}
+
+
+
+.music-input:focus {
+    border-color: rgb(0, 0, 0);
+    outline: none;
+}
+
+
+
+.preview-container {
+    width: 90%; /* Instead of fixed width */
+    max-width: 350px; /* Maximum width */
+    margin: 0 auto;
+    height: 700px;
+    background-color: #1f2022;
+    border-radius: 8px;
+    overflow: hidden;
+    font-family: 'Rubik', sans-serif;
+    color: white;
+}
+
+.preview-tools {
+    display: flex;
+    align-items: center;
+    padding: 9px;
+    background-color: #1f2022;
+}
+
+.preview-circle {
+    padding: 0 4px;
+}
+
+.preview-box {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.preview-red {
+    background-color: #ff605c;
+}
+
+.preview-yellow {
+    background-color: #ffbd44;
+}
+
+.preview-green {
+    background-color: #00ca4e;
+}
+
+.preview-content {
+    padding: 20px;
+}
+
+
+.preview-content {
+    padding: 20px;
+}
+
+
+
+.preview-image-container {
+    border-radius: 12px;
+    width: 100%;
+    padding-top: 133.33%;
+    position: relative;
+    overflow: hidden;
+    background-color: transparent;
+    border: 2px solid #ff0000;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+
+
+
+.preview-image {
+    border-radius: 12px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+    object-position: center;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+.preview-time-container {
+    
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.preview-time span {
+    
+    margin-top: 40px;
+    font-weight: bold;
+    margin: 0 2px;
+}
+
+.preview-time{
+    margin-top: 20px;
+
+}
+
+.together-text {
+    font-weight: bold;
+    margin-right: 5px;
+    color: #ffffffb0; /* You can change this color to match your design */
+}
+
+
+.preview-container {
+    width: 360px;
+    height: 700px;
+    margin: 0 auto;
+    background-color: #1f2022;
+    border-radius: 8px;
+    overflow-y: scroll;
+    font-family: 'Rubik', sans-serif;
+    color: white;
+    scrollbar-width: thin;
+    scrollbar-color: #333 #01111d;
+}
+
+.preview-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.preview-container::-webkit-scrollbar-track {
+    background-color: #1f2022;
+}
+
+.preview-container::-webkit-scrollbar-thumb {
+    background-color: #333;
+    border-radius: 4px;
+    border: 2px solid #011522;
+}
+.preview-message {
+    text-align: center;
+    color: #ffffff;
+    font-size: 14px;
+    line-height: 1.4;
+    max-width: 90%;
+    margin: 0 auto;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.preview-separator {
+    
+    width: 200px;
+    border: none;
+    
+    border-top: 2px solid #cccccc91;
+    margin: 30px auto;
+    margin-top: 50px;
+}
+
+.preview-audio-container {
+   
+    margin-top: 20px;
+    text-align: center;
+}
+
+
+
+.preview-audio-player {
+    width: 100%;
+    max-width: 300px;
+}
+
+
+.main-container {
+    display: flex;
+    
+    
+    
+    padding: 20px;
+    
+}
+
+.left-column {
+    flex: 1;
+    
+}
+
+.right-column {
+    margin-right: 10%;
+    margin-top: 120px;
+    align-self: flex-start;
+    flex-shrink: 0; /* Prevents the right column from shrinking */
+    width: 360px; /* Set a fixed width for the preview container */
+}
+
+
+
+.theme-selector {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 10px;
+    padding-left: 10px; /* Adjust this value to move the balls more to the left */
+}
+
+.theme-ball {
+    width: 15px; /* Reduced from 30px */
+    height: 15px; /* Reduced from 30px */
+    border-radius: 50%;
+    margin-right: 10px; /* Changed from margin: 0 10px; to only have right margin */
+    cursor: pointer;
+    
+    transition: transform 0.3s ease;
+}
+
+.theme-ball:hover {
+    transform: scale(1.1);
+}
+
+.theme-ball.black {
+    background-color: #000;
+}
+
+.theme-ball.white {
+    background-color: #fff;
+}
+
+.theme-ball.selected {
+    box-shadow: 0 0 0 2px #ff0000;
+}
+
+/* Dark theme styles */
+.preview-container.dark-theme {
+    background-color: #1f2022;
+    color: white;
+}
+
+/* Light theme styles */
+.preview-container.light-theme {
+    background-color: #fcf2f2;
+    color: black;
+}
+
+.preview-container.light-theme .preview-tools {
+    background-color: #fcf2f2;
+}
+
+.preview-container.light-theme .preview-message,
+.preview-container.light-theme .preview-time-container {
+    color: #000;
+}
+
+.preview-container.light-theme .preview-separator {
+    border-top-color: #33333391;
+}
+
+
+
+.preview-container.dark-theme .together-text {
+    color: #ffffffb0;
+}
+
+.preview-container.light-theme .together-text {
+    color: #000000b0;
+}
+
+.preview-container.light-theme .preview-image-container {
+    border-color: #000000;
+}
+
+#heart-shower-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+  }
+  
+  .heart {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: url('heart.png') no-repeat; /* Make sure to add a heart.png image to your project */
+    background-size: cover;
+  }
+
+
+  footer {
+    margin-top: 150px;
+    border-top: 2px solid #ff4343;
+    padding-top: 20px;
+    font-family: rubik;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 100px;
+    max-width: 1100px;
+    margin: 0 auto;
+}   
+
+.footer-left {
+    text-align: left;
+}
+
+.footer-logo {
+    width: 125px;
+    max-width: 150px;
+    margin-bottom: -10px;
+}
+
+.footer-tagline {
+    margin-bottom: -5px;
+}
+
+.footer-copyright {
+    margin-bottom: 25px;
+    color: #00000062;
+    font-size: 13px;
+    
+}
+
+.creator-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    border: 2px solid #FF0000;
+    border-radius: 10px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.creator-photo {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.creator-button span {
+    color: #333;
+    font-size: 14px;
+}
+
+
+.footer-right {
+    padding-top: 20px;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li:first-child {
+    margin-bottom: 30px;
+}
+
+.footer-links li {
+    margin-bottom: 10px;
+    
+}
+
+.footer-links a {
+    text-decoration: none;
+    color: #333;
+}
+
+.footer-links a:hover {
+    color: #ff4848;
+}
+
+.i{
+    color: #00000062;
+    
+    
+
+}
+
+  
+
+@media screen and (max-width: 1250px) {
+
+    .subtitle br {
+        display: none;
+    }
+    
+    .subtitle {
+        margin-top: -30px;
+        font-size: 20px;
+    }
+    .main-container{
+        margin-top: -50px;
+    }
+
+
+    .main-title {
+        margin-top: 110px;
+        line-height: 1; /* Further reduce line height for smaller screens */
+    }
+    .language-options {
+        margin-top: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .input-group {
+        flex-direction: column;
+    }
+
+    .input-group input,
+    #couple-names,
+    button[type="submit"],
+    .file-input-label,
+    .music-input,
+    .message-input textarea {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+    }
+
+    .input-group input[type="time"],
+    .input-group input[type="date"] {
+        width: calc(50% - 7px);
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    .input-group input[type="date"] {
+        margin-right: 10px;
+    }
+
+    .input-group input:last-of-type {
+        margin-bottom: 0;
+    }
+
+    .price-selection-container,
+    .price-selection {
+        width: 100%;
+    }
+
+    .price-option {
+        flex: 1;
+        text-align: center;
+    }
+
+
+    .preview-container {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        
+        padding-bottom: 50%; /* Adjust this value to change the aspect ratio */
+        position: relative;
+        margin-bottom: 20px;
+
+        width: 100%;
+        height: auto;
+        max-height: 1000px; /* Adjust this value as needed */
+        overflow-y: visible;
+    }
+
+    .preview-content {
+        overflow-y: auto;
+    }
+
+    .right-column {
+        display: flex;
+        flex-direction: column;
+        
+        width: 100%;
+    }
+
+    .preview-message {
+        max-height: 200px; /* Adjust this value based on your design */
+        overflow-y: auto;
+    }
+
+    .logo {
+        position: static;
+        transform: none;
+        margin-left: -20px; /* Adjust this value to match the left column padding */
+    }
+
+
+
+
+    .theme-selector {
+        width: 100%;
+        justify-content: center;
+        margin-top: 0;
+        padding-left: 0;
+    }
+
+    .main-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .right-column {
+        margin-right: 0;
+        margin-top: 50px;
+        align-self: center;
+        width: 100%;
+        
+    }
+
+    .preview-container {
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .page-container{
+        margin-left: 20px;
+    }
+
+
+
+
+}
+
+@media screen and (max-width: 500px) {
+
+    .price-selection-container{
+        margin-top: 30px;
+    }
+
+    .form-container{
+        margin-top: 25px;
+    }
+
+    .main-title{
+        font-size: 14vw;
+    }
+
+    .subtitle{
+        font-size: 15px;
+        margin-top: -25px;
+        margin-left: 5px;
+    }
+
+    .main-container{
+        margin-top: -90px;
+    }
+
+    .right-column{
+        margin-top: 50px;
+    }
+
+    #create-page-button{
+        margin-top: 0px;
+
+    }
+
+    .form-container {
+        max-width: 850px;
+        margin-top: 10px;  /* Reduzido de 50px */
+        border-radius: 8px;
+    }
+    
+    .input-group {
+        justify-content: space-between;
+        margin-bottom: 10px;  /* Reduzido de 15px */
+    }
+    
+    .message-input {
+        margin-top: -10px;  /* Reduzido de 15px */
+    }
+    
+    .file-input-label {
+        margin-top: 00px;  /* Reduzido de 15px */
+    }
+    
+    .music-upload {
+        margin-top: 00px;  /* Reduzido de 20px */
+    }
+    
+    button[type="submit"] {
+        margin-top: 15px;  /* Reduzido de 20px */
+    }
+    
+    .input-group input,
+    .message-input textarea,
+    .file-input-label,
+    .youtube-input {
+        margin-bottom: 8px;  /* Adicionado para consistência */
+    }
+
+
+
+
+
+    
+
+    .preview-container {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        
+        padding-bottom: 30%; /* Adjust this value to change the aspect ratio */
+        position: relative;
+        margin-bottom: 20px;
+
+        
+       
+        
+        width: 100%;
+        height: auto;
+        max-height: 600px; /* Adjust this value as needed */
+        overflow-y: visible;
+    }
+
+
+    .page-container {
+        padding: 0 16.5px;
+        
+    }
+
+
+
+}
+
+
+
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+
+    .time {
+        font-size: 3vw;
+    }
+
+    .message {
+        font-size: 3.5vw;
+    }
+}
+
+.preview-heart-emoji {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 10px;
+    /* Keep any existing styles for vertical positioning */
+}
+.preview-content {
+    position: relative;
+    overflow: hidden;
+}
+
+.preview-bubbles {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.bubble {
+    position: absolute;
+    bottom: -50px;
+    opacity: 0;
+    animation: rise-bubble 5s ease-in-out forwards;
+}
+
+.heart-small {
+    font-size: 40px;
+    left: 8%;
+    animation-delay: 0.5s;
+    color: red;
+}
+
+.heart-large {
+    font-size: 60px;
+    left: 70%;
+    animation-delay: 1s;
+    color: red;
+}
+
+.heart-medium {
+    font-size: 50px;
+    left: 40%;
+    animation-delay: 1.5s;
+    color: red;
+}
+
+.bubble.heart-small {
+    animation-delay: 0.5s;
+}
+
+.bubble.heart-medium {
+    animation-delay: 1.5s;
+}
+
+.bubble.heart-large {
+    animation-delay: 1s;
+}
+
+@keyframes rise-bubble {
+    0% {
+        bottom: -50px;
+        opacity: 0;
+        transform: translateX(0);
+    }
+    10% {
+        opacity: 1;
+        transform: translateX(-10px);
+    }
+    30% {
+        transform: translateX(10px);
+    }
+    50% {
+        transform: translateX(-6px);
+    }
+    70% {
+        transform: translateX(6px);
+    }
+    90% {
+        opacity: 1;
+        transform: translateX(-0px);
+    }
+    100% {
+        bottom: 100%;
+        opacity: 0;
+        transform: translateX(0px);
+    }
+}
+
+
+
+.image-slideshow {
+    width: 100%;
+    overflow: hidden;
+}
+
+.slideshow-container {
+    display: flex;
+    transition: transform 0.5s ease;
+}
+
+.slideshow-container img {
+    flex-shrink: 0;
+    width: 90%;
+    margin-right: 10%;
+
+}
+
+
+
+.youtube-input {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    color: rgb(0, 0, 0);
+    
+    border: 2px solid red;
+    margin-top: 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    
+    font-weight: bold;
+    text-align: center;
+    min-height: 44px;
+    width: 818px;
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.youtube-input input{
+    background-color: transparent;
+    color: rgb(0, 0, 0);
+    font-family: rubik;
+
+
+}
+
+.youtube-input::placeholder {
+    color: rgb(0, 0, 0);
+}
+
+.youtube-input:focus {
+    outline: none;
+    border-color: #ff0000;
+}
+
+.youtube-input:hover{
+    cursor: text;
+}
+
+
+
+
+
+@media screen and (max-width: 900px) {
+
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+
+        
+        
+        padding: 20px 30px;
+        max-width: 90%;
+        
+    }
+
+    .footer-left {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .footer-right {
+        
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .footer-links {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .creator-button {
+        margin: 0 auto;
+    }
+
+
+
+
+}
+
+
+
+@media screen and (max-width: 370px) {
+    .price-option {
+        
+        font-size: 10px;
+      
+  
+    }
+
+
+
+}
