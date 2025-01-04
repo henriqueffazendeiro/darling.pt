@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="loading.css">
+</head>
+
+<body>
+    <div class="loading-container" id="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Carregando...</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <img src="logo.png" alt="Logo" class="logo">
+
+        </header>
+        <div class="main-content">
+            <div class="left-content">
+                <h1>Um presente Inesquecível</h1>
+                <h2>Crie uma página dinâmica e exclusiva. Partilhe com alguém especial e faça uma
+                    surpresa inesquecível. <br> Só apontar para o QR code 💕</h2>
+
+                <button class="cta-button" onclick="window.location.href='produto.html'"><strong>Criar o meu
+                        site</strong></button>
+
+            </div>
+            <div class="right-content">
+                <img src="uma.png" alt="Casal Feliz" class="jss-image">
+                <!-- or if the image is in the root public folder -->
+                <!-- <img src="./uma.png" alt="Casal Feliz" class="jss-image"> -->
+            </div>
+
+        </div>
+        <div class="happy-couples">
+            +3500 casais felizes
+        </div>
+
+        <section class="how-it-works">
+            <div class="steps-container">
+                <div class="left-image">
+                    <img src="5.png" alt="Step 5">
+                </div>
+                <div class="steps">
+                    <div class="step-row">
+                        <div class="step">
+                            <img src="1.png" alt="Step 1">
+
+                        </div>
+                        <div class="step">
+                            <img src="2.png" alt="Step 2">
+
+                        </div>
+                    </div>
+                    <div class="step-row">
+                        <div class="step">
+                            <img src="3.png" alt="Step 3">
+
+                        </div>
+                        <div class="step">
+                            <img src="4.png" alt="Step 4">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="pricing">
+            <h2>Preços</h2>
+            <div class="price-options">
+                <div class="price-box">
+                    <h3>Básico</h3>
+                    <p class="price"><strong>$5</strong></p>
+                    <ul>
+                        <li><strong>1 ano de acesso</strong></li>
+                        <li><strong>5 fotos</strong></li>
+                        <li class="no-music"><strong>Sem música</strong></li>
+                    </ul>
+                    <button onclick="window.location.href='produto.html'"><strong>Escolher</strong></button>
+
+                </div>
+                <div class="price-box popular">
+                    <div class="popular-tag">⭐ Mais escolhido</div>
+                    <h3>Premium</h3>
+                    <p class="price"><strong>$10</strong></p>
+                    <ul>
+                        <li><strong>Para sempre</strong></li>
+                        <li><strong>10 fotos</strong></li>
+                        <li><strong>Com música</strong></li>
+                    </ul>
+                    <button
+                        onclick="window.location.href='http://127.0.0.1:3000/produto.html?plan=premium'"><strong>Escolher</strong></button>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="faq">
+            <h2>Perguntas frequentes</h2>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span><strong>O que é a missyuu?</strong></span>
+                        <div class="arrow"></div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>A missyuu é uma plataforma que permite criar páginas personalizadas de relacionamento para
+                            casais. Você pode adicionar fotos, uma mensagem especial e um contador que mostra há quanto
+                            tempo vocês estão juntos.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span><strong>Como recebo minha página personalizada após o pagamento?</strong></span>
+                        <div class="arrow"></div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Após a conclusão do pagamento, você receberá um QR code para compartilhar com seu parceiro(a)
+                            e um link via e-mail para acessar a página.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span><strong>A página personalizada tem validade?</strong></span>
+                        <div class="arrow"></div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>No preço básico sim, 1 ano. No plano avançado, a página personalizada estará disponível para
+                            você pelo resto da vida.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span><strong>Quais são as formas de pagamento?</strong></span>
+                        <div class="arrow"></div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>No momento, aceitamos todas as formas de pagamentos disponibilizadas pela Stripe.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span><strong>Quanto tempo demora para receber o QR Code no e-mail?</strong></span>
+                        <div class="arrow"></div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Receberá o seu link e QR Code dentro de 10 minutos. </p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span><strong>Como posso entrar em contacto com o suporte ao cliente?</strong></span>
+                        <div class="arrow"></div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Você pode entrar em contato com nosso suporte ao cliente através do e-mail
+                            henriquefazendeiropy@gmail.com. </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-left">
+                    <img src="logo.png" alt="Logo" class="footer-logo">
+                    <p class="footer-tagline">Surpreenda o seu amor criando o seu <br> contador de tempo de
+                        relacionamento</p>
+                    <p class="footer-copyright">Copyright © 2024 - Todos os direitos reservados</p>
+                    <div class="footer-creator">
+                        <button class="creator-button"
+                            onclick="window.location.href='https://www.instagram.com/f_azendeiro'">
+                            <img src="profile-photo.png" alt="f_azendeiro" class="creator-photo">
+                            <span><strong>Feito por f_azendeiro</strong></span>
+                        </button>
+                    </div>
+                </div>
+                <div class="footer-right">
+                    <ul class="footer-links">
+                        <li class="i"><strong>Legal</strong></li>
+                        <li><a href="/terms">Termos de uso</a></li>
+                        <li><a href="/privacy">Termos de privacidade</a></li>
+                    </ul>
+                </div>
+            </div>
+        </footer>
+
+
+    </div>
+
+    <script src="scripts.js"></script>
+    <script>
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('loading-screen');
+            setTimeout(() => {
+                loader.classList.add('fade-out');
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500);
+            }, 1000); // Show loading for at least 1 second
+        });
+
+        // Hide loading screen if it's shown for too long
+        setTimeout(() => {
+            const loader = document.getElementById('loading-screen');
+            if (loader && !loader.classList.contains('fade-out')) {
+                loader.classList.add('fade-out');
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500);
+            }
+        }, 5000); // Fallback after 5 seconds
+    </script>
+</body>
+
+</html>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
