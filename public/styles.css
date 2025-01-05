@@ -267,6 +267,8 @@ button[type="submit"]:hover {
     width: 813px;
     height: 200px;
     color: rgb(0, 0, 0);
+    font-size: 14px;
+    font-family: rubik;
 }
 
 
@@ -1095,13 +1097,13 @@ button[type="submit"]:hover {
     align-items: center;
     background-color: transparent;
     color: rgb(0, 0, 0);
-    
+    font-family: rubik;
     border: 2px solid red;
     margin-top: 15px;
     border-radius: 4px;
-    cursor: pointer;
-    
-    font-weight: bold;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: normal;
     text-align: center;
     min-height: 44px;
     width: 818px;
@@ -1111,16 +1113,25 @@ button[type="submit"]:hover {
     box-sizing: border-box;
 }
 
+.youtube-input::placeholder {
+    color: rgb(255, 118, 118);
+    font-family: rubik;
+    font-size: 16px;
+    font-weight: bold;
+}
+
 .youtube-input input{
     background-color: transparent;
     color: rgb(0, 0, 0);
-    font-family: rubik;
+    
 
 
 }
 
 .youtube-input::placeholder {
-    color: rgb(0, 0, 0);
+    color: rgb(255, 118, 118);
+    font-family: rubik;
+    font-size: 16px;
 }
 
 .youtube-input:focus {
