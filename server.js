@@ -193,7 +193,7 @@ app.post('/create-checkout-session', async (req, res) => {
             throw new Error('Dados da página ausentes ou inválidos.');
         }
 
-        const price = plan === 'premium' ? 1000 : 500;
+        const price = plan === 'premium' ? 999 : 499; // Changed from 1000/500 to 999/499 (cents)
 
         // Create Stripe session
         const session = await stripe.checkout.sessions.create({
