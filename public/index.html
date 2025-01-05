@@ -108,22 +108,22 @@
         </section>
 
         <section class="faq">
-            <h2>Perguntas frequentes</h2>
+
             <div class="faq-container">
                 <section class="faq">
                     <h2>Perguntas frequentes</h2>
                     <div class="faq-container">
                         <div class="faq-item">
                             <div class="faq-question">
-                                <span><strong>O que é a missyuu?</strong></span>
+                                <span><strong>O que é a Darling?</strong></span>
                                 <div class="arrow"></div>
                             </div>
                             <div class="faq-answer">
-                                <p>A missyuu é uma plataforma que permite criar páginas personalizadas de relacionamento
+                                <p>A Darling é uma plataforma que permite criar páginas personalizadas de relacionamento
                                     para
-                                    casais. Você pode adicionar fotos, uma mensagem especial e um contador que mostra há
+                                    casais. Você pode adicionar fotos, uma mensagem especial, um contador que mostra há
                                     quanto
-                                    tempo vocês estão juntos.</p>
+                                    tempo vocês estão juntos e uma música especial.</p>
                             </div>
                         </div>
                         <div class="faq-item">
@@ -143,7 +143,7 @@
                                 <div class="arrow"></div>
                             </div>
                             <div class="faq-answer">
-                                <p>No preço básico sim, 1 ano. No plano avançado, a página personalizada estará
+                                <p>No preço básico sim, 1 ano. No plano premium, a página personalizada estará
                                     disponível para
                                     você pelo resto da vida.</p>
                             </div>
@@ -154,7 +154,8 @@
                                 <div class="arrow"></div>
                             </div>
                             <div class="faq-answer">
-                                <p>No momento, aceitamos todas as formas de pagamentos disponibilizadas pela Stripe.</p>
+                                <p>No momento, aceitamos todas as formas de pagamentos disponibilizadas pela Stripe .
+                                </p>
                             </div>
                         </div>
                         <div class="faq-item">
@@ -173,7 +174,7 @@
                             </div>
                             <div class="faq-answer">
                                 <p>Você pode entrar em contato com nosso suporte ao cliente através do e-mail
-                                    henriquefazendeiropy@gmail.com. </p>
+                                    darlingpt.contact@gmail.com. </p>
                             </div>
                         </div>
 
@@ -230,6 +231,42 @@
                         }, 500);
                     }
                 }, 5000); // Fallback after 5 seconds
+            </script>
+            <script>
+                // FAQ Toggle functionality
+                document.addEventListener('DOMContentLoaded', function () {
+                    const faqItems = document.querySelectorAll('.faq-item');
+
+                    faqItems.forEach(item => {
+                        const question = item.querySelector('.faq-question');
+                        const answer = item.querySelector('.faq-answer');
+
+                        question.addEventListener('click', function () {
+                            // First, close all other items
+                            faqItems.forEach(otherItem => {
+                                if (otherItem !== item) {
+                                    otherItem.classList.remove('active');
+                                    const otherAnswer = otherItem.querySelector('.faq-answer');
+                                    otherAnswer.style.maxHeight = '0';
+                                    otherAnswer.style.opacity = '0';
+                                }
+                            });
+
+                            // Toggle current item
+                            const isActive = item.classList.contains('active');
+                            item.classList.toggle('active');
+
+                            // Toggle answer visibility
+                            if (!isActive) {
+                                answer.style.maxHeight = answer.scrollHeight + 'px';
+                                answer.style.opacity = '1';
+                            } else {
+                                answer.style.maxHeight = '0';
+                                answer.style.opacity = '0';
+                            }
+                        });
+                    });
+                });
             </script>
 </body>
 

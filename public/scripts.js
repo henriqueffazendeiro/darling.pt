@@ -1,24 +1,38 @@
 // Atualiza o preview, validação do formulário e seleção de plano
 document.addEventListener('DOMContentLoaded', function () {
+    // Get page elements
     const fileInput = document.getElementById('file-input');
     const dateInput = document.getElementById('relationship-date');
     const timeInput = document.getElementById('relationship-time');
     const messageInput = document.getElementById('message');
     const createPageButton = document.getElementById('create-page-button');
     const priceOptions = document.querySelectorAll('.price-option');
+    const musicUpload = document.querySelector('.music-upload');
 
-    // Função para selecionar o plano
+    // Check URL parameters for plan selection
+    const urlParams = new URLSearchParams(window.location.search);
+    const plan = urlParams.get('plan');
+    
+    // Select plan based on URL parameter
+    if (plan === 'premium') {
+        const premiumOption = document.querySelector('.price-option[id="2"]');
+        if (premiumOption) {
+            selectPrice(premiumOption);
+            musicUpload.style.display = 'block';
+            document.getElementById('photo-label').textContent = 'Escolher fotos de casal (máximo 10)';
+        }
+    }
+
+    // Function to handle price selection
     function selectPrice(element) {
         priceOptions.forEach(option => option.classList.remove('selected'));
         element.classList.add('selected');
-        
-        // Atualizar a visibilidade do input de música
-        const musicUpload = document.querySelector('.music-upload');
-        if (element.id === '2') {
-            musicUpload.style.display = 'block';
-        } else {
-            musicUpload.style.display = 'none';
-        }
+
+        // Update UI based on selected plan
+        const isPremium = element.id === '2';
+        musicUpload.style.display = isPremium ? 'block' : 'none';
+        document.getElementById('photo-label').textContent = 
+            `Escolher fotos de casal (máximo ${isPremium ? '10' : '5'})`;
     }
 
     // Adicionar evento de clique para cada opção de preço
@@ -29,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Verificar parâmetro na URL e selecionar plano apropriado
-    const urlParams = new URLSearchParams(window.location.search);
+    
     const planParam = urlParams.get('plan');
     
     if (planParam === 'premium') {
@@ -131,4 +145,3 @@ document.getElementById('create-page-button').addEventListener('click', async (e
         alert('Erro ao criar sessão de pagamento.');
     }
 });
-
