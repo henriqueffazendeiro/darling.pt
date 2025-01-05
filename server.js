@@ -197,7 +197,7 @@ app.post('/create-checkout-session', async (req, res) => {
 
         // Create Stripe session
         const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'], // Only allow card payments
+            payment_method_types: ['card'],
             line_items: [{
                 price_data: {
                     currency: 'usd',
@@ -211,12 +211,7 @@ app.post('/create-checkout-session', async (req, res) => {
             mode: 'payment',
             success_url: `${process.env.BASE_URL}/success.html`,
             cancel_url: `${process.env.BASE_URL}/cancel.html`,
-            // Optional: Force card-only UI
-            payment_method_options: {
-                card: {
-                    setup_future_usage: 'off' // Disable future usage option
-                }
-            }
+            // Remove payment_method_options since we don't need to save cards
         });
 
         console.log('Stripe session created:', session.id);
