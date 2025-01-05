@@ -456,6 +456,41 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     .main-content.visible {
                         display: block;
                     }
+
+                    .loading-container {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-color: ${theme === 'dark' ? '#1f2022' : '#ffffff'};
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 1000;
+                    }
+
+                    .loading-content {
+                        text-align: center;
+                    }
+
+                    .tap-to-start {
+                        margin-top: 20px;
+                        font-size: 18px;
+                        color: ${theme === 'dark' ? '#ffffff' : '#000000'};
+                        position: fixed;
+                        bottom: 50px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                    }
+
+                    .main-content {
+                        display: none;
+                    }
+
+                    .main-content.visible {
+                        display: block;
+                    }
                 </style>
             </head>
             <body>
@@ -463,6 +498,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     <div class="loading-content">
                         <div class="loader"></div>
                     </div>
+                    <div class="tap-to-start">Toque para começar</div>
                 </div>
 
                 <div class="main-content">
