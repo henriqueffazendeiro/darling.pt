@@ -447,13 +447,6 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         margin-top: 40px;
                         font-size: 18px;
                         color: ${theme === 'dark' ? '#ffffff' : '#000000'};
-                        animation: pulse 1.5s infinite;
-                    }
-
-                    @keyframes pulse {
-                        0% { transform: scale(1); opacity: 1; }
-                        50% { transform: scale(1.1); opacity: 0.8; }
-                        100% { transform: scale(1); opacity: 1; }
                     }
 
                 </style>
@@ -461,7 +454,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
             <body>
                 <div class="loading-screen">
                     <div class="loader"></div>
-                    <div class="tap-to-start">Toque na tela para começar</div>
+                    <div class="tap-to-start">Toque na tela para abrir</div>
                 </div>
 
                 <div class="main-content">
