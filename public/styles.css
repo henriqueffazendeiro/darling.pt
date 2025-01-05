@@ -384,6 +384,8 @@ button[type="submit"]:hover {
 
 .preview-content {
     padding: 20px;
+    color: white;
+    background-color: #1f2022;
 }
 
 
@@ -529,80 +531,6 @@ button[type="submit"]:hover {
     align-self: flex-start;
     flex-shrink: 0; /* Prevents the right column from shrinking */
     width: 360px; /* Set a fixed width for the preview container */
-}
-
-
-
-.theme-selector {
-    display: flex;
-    justify-content: flex-start;
-    margin-top: 10px;
-    padding-left: 10px; /* Adjust this value to move the balls more to the left */
-}
-
-.theme-ball {
-    width: 15px; /* Reduced from 30px */
-    height: 15px; /* Reduced from 30px */
-    border-radius: 50%;
-    margin-right: 10px; /* Changed from margin: 0 10px; to only have right margin */
-    cursor: pointer;
-    
-    transition: transform 0.3s ease;
-}
-
-.theme-ball:hover {
-    transform: scale(1.1);
-}
-
-.theme-ball.black {
-    background-color: #000;
-}
-
-.theme-ball.white {
-    background-color: #fff;
-}
-
-.theme-ball.selected {
-    box-shadow: 0 0 0 2px #ff0000;
-}
-
-/* Dark theme styles */
-.preview-container.dark-theme {
-    background-color: #1f2022;
-    color: white;
-}
-
-/* Light theme styles */
-.preview-container.light-theme {
-    background-color: #fcf2f2;
-    color: black;
-}
-
-.preview-container.light-theme .preview-tools {
-    background-color: #fcf2f2;
-}
-
-.preview-container.light-theme .preview-message,
-.preview-container.light-theme .preview-time-container {
-    color: #000;
-}
-
-.preview-container.light-theme .preview-separator {
-    border-top-color: #33333391;
-}
-
-
-
-.preview-container.dark-theme .together-text {
-    color: #ffffffb0;
-}
-
-.preview-container.light-theme .together-text {
-    color: #000000b0;
-}
-
-.preview-container.light-theme .preview-image-container {
-    border-color: #000000;
 }
 
 #heart-shower-container {
@@ -827,13 +755,6 @@ button[type="submit"]:hover {
 
 
 
-
-    .theme-selector {
-        width: 100%;
-        justify-content: center;
-        margin-top: 0;
-        padding-left: 0;
-    }
 
     .main-container {
         flex-direction: column;
