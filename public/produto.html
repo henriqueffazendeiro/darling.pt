@@ -394,7 +394,29 @@
 
         // Update the price selection function to show/hide YouTube input
         function selectPrice(element, maxPhotos) {
-            // ...existing price selection code...
+            // Remove selected class from all options
+            document.querySelectorAll('.price-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+
+            // Add selected class to clicked option
+            element.classList.add('selected');
+
+            // Update photo label
+            document.getElementById('photo-label').textContent = `Escolher fotos de casal (máximo ${maxPhotos})`;
+
+            // Reset all form inputs
+            document.getElementById('couple-names').value = '';
+            document.getElementById('relationship-date').value = '';
+            document.getElementById('relationship-time').value = '';
+            document.getElementById('message').value = '';
+            document.getElementById('file-input').value = '';
+            document.getElementById('youtube-url').value = '';
+
+            // Reset preview elements
+            document.querySelector('.preview-image').src = '';
+            document.getElementById('preview-message').textContent = '';
+            document.getElementById('youtube-embed').innerHTML = '';
 
             // Show/hide YouTube URL input based on plan
             const musicUpload = document.querySelector('.music-upload');
@@ -406,7 +428,6 @@
             } else {
                 musicUpload.style.display = 'none';
                 youtubeEmbed.style.display = 'none';
-                document.getElementById('youtube-url').value = ''; // Clear URL
             }
         }
     </script>
