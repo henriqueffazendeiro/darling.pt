@@ -418,6 +418,20 @@
             document.getElementById('preview-message').textContent = '';
             document.getElementById('youtube-embed').innerHTML = '';
 
+            // Reset time preview
+            document.getElementById('preview-years').textContent = '0';
+            document.getElementById('preview-months').textContent = '0';
+            document.getElementById('preview-days').textContent = '0';
+            document.getElementById('preview-hours').textContent = '0';
+            document.getElementById('preview-minutes').textContent = '0';
+            document.getElementById('preview-seconds').textContent = '0';
+
+            // Clear image preview container
+            const previewImageContainer = document.querySelector('.preview-image-container');
+            if (previewImageContainer) {
+                previewImageContainer.innerHTML = '<img class="preview-image" src="" onload="handleImageLoad(this)">';
+            }
+
             // Show/hide YouTube URL input based on plan
             const musicUpload = document.querySelector('.music-upload');
             const youtubeEmbed = document.getElementById('youtube-embed');
