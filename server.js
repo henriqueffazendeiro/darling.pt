@@ -456,6 +456,29 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     .main-content.visible {
                         display: block;
                     }
+
+                    @keyframes explode {
+                        0% { transform: scale(1); opacity: 1; }
+                        50% { transform: scale(2.5); opacity: 0.5; }
+                        100% { transform: scale(4); opacity: 0; }
+                    }
+
+                    @keyframes fadeOut {
+                        0% { opacity: 1; }
+                        100% { opacity: 0; visibility: hidden; }
+                    }
+
+                    .loading-screen.fade-out {
+                        animation: fadeOut 1s forwards;
+                    }
+
+                    .loading-heart.explode {
+                        animation: explode 0.8s forwards;
+                    }
+
+                    .loading-screen {
+                        transition: opacity 1s;
+                    }
                 </style>
             </head>
             <body>
@@ -627,23 +650,37 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         const mainContent = document.querySelector('.main-content');
 
                         function startPage() {
-                            loadingScreen.classList.add('hidden');
-                            mainContent.classList.add('visible');
+                            const heart = document.querySelector('.loading-heart');
+                            const screen = document.querySelector('.loading-screen');
                             
-                            // Start background music if exists
-                            const audio = document.querySelector('audio');
-                            if (audio) {
-                                audio.play().catch(e => console.log("Audio play failed:", e));
-                            }
+                            // Trigger heart explosion
+                            heart.classList.add('explode');
+                            
+                            // Start fade out after heart explosion
+                            setTimeout(() => {
+                                screen.classList.add('fade-out');
+                                
+                                // Show main content after fade out
+                                setTimeout(() => {
+                                    screen.classList.add('hidden');
+                                    mainContent.classList.add('visible');
+                                    
+                                    // Start background music if exists
+                                    const audio = document.querySelector('audio');
+                                    if (audio) {
+                                        audio.play().catch(e => console.log("Audio play failed:", e));
+                                    }
 
-                            // Start YouTube video if exists
-                            const youtubePlayer = document.getElementById('youtube-iframe');
-                            if (youtubePlayer) {
-                                youtubePlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                            }
+                                    // Start YouTube video if exists
+                                    const youtubePlayer = document.getElementById('youtube-iframe');
+                                    if (youtubePlayer) {
+                                        youtubePlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                                    }
 
-                            // Initialize all other scripts
-                            initializePageScripts();
+                                    // Initialize all other scripts
+                                    initializePageScripts();
+                                }, 1000); // Wait for fade out to complete
+                            }, 400); // Start fade out halfway through heart explosion
                         }
 
                         // Wait for user interaction
