@@ -197,7 +197,7 @@ app.post('/create-checkout-session', async (req, res) => {
 
         // Create Stripe session
         const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
+            payment_method_types: ['card'], // Only allow card payments
             line_items: [{
                 price_data: {
                     currency: 'usd',
@@ -210,8 +210,12 @@ app.post('/create-checkout-session', async (req, res) => {
             }],
             mode: 'payment',
             success_url: `${process.env.BASE_URL}/success.html`,
-            cancel_url: `${process.env.BASE_URL}/cancel.html`
-            // Removed billing_address_collection: 'required'
+            cancel_url: `${process.env.BASE_URL}/cancel.html`,
+            payment_method_options: {
+                card: {
+                    setup_future_usage: 'off'  // Disable saving payment method
+                }
+            }
         });
 
         console.log('Stripe session created:', session.id);
