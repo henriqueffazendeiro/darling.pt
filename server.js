@@ -459,9 +459,10 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                 </style>
             </head>
             <body>
-                <div class="loading-screen">
-                    <div class="loading-heart">❤️</div>
-                    <div class="tap-to-start">Toque na tela para começar</div>
+                <div class="loading-container" id="loading-screen">
+                    <div class="loading-content">
+                        <div class="loader"></div>
+                    </div>
                 </div>
 
                 <div class="main-content">
