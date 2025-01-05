@@ -425,57 +425,24 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         justify-content: center;
                         align-items: center;
                         z-index: 1000;
+                        opacity: 1;
+                        transition: opacity 0.5s ease-in-out;
                     }
 
-                    .loader {
-                        position: relative;
-                        width: 40px;
-                        height: 60px;
-                        animation: heartBeat 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
-                        margin: 0 auto;
-                    }
-
-                    .loader:before,
-                    .loader:after {
-                        content: "";
-                        background: red;
-                        width: 40px;
-                        height: 60px;
-                        border-radius: 50px 50px 0 0;
-                        position: absolute;
-                        left: 0;
-                        bottom: 0;
-                        transform: rotate(45deg);
-                        transform-origin: 50% 68%;
-                        box-shadow: 5px 4px 5px #0004 inset;
-                    }
-
-                    .loader:after {
-                        transform: rotate(-45deg);
-                    }
-
-                    @keyframes heartBeat {
-                        0% { transform: scale(0.95); }
-                        5% { transform: scale(1.1); }
-                        39% { transform: scale(0.85); }
-                        45% { transform: scale(1); }
-                        60% { transform: scale(0.95); }
-                        100% { transform: scale(0.9); }
-                    }
-
-                    .tap-to-start {
-                        margin-top: 40px;
-                        font-size: 18px;
-                        color: ${theme === 'dark' ? '#ffffff' : '#000000'};
+                    .loading-screen.hidden {
+                        opacity: 0;
+                        pointer-events: none;
                     }
 
                     .main-content {
-                        display: none;
+                        opacity: 0;
+                        transition: opacity 0.5s ease-in-out;
                     }
 
                     .main-content.visible {
-                        display: block;
+                        opacity: 1;
                     }
+
                 </style>
             </head>
             <body>
@@ -647,9 +614,16 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         const mainContent = document.querySelector('.main-content');
 
                         function startPage() {
-                            loadingScreen.classList.add('hidden');
-                            mainContent.classList.add('visible');
-                            
+                            const loadingScreen = document.querySelector('.loading-screen');
+                            const mainContent = document.querySelector('.main-content');
+
+                            // First show main content
+                            mainContent.style.display = 'block';
+                            setTimeout(() => {
+                                mainContent.classList.add('visible');
+                                loadingScreen.classList.add('hidden');
+                            }, 100);
+
                             // Start background music if exists
                             const audio = document.querySelector('audio');
                             if (audio) {
@@ -663,7 +637,10 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                             }
 
                             // Initialize all other scripts
-                            initializePageScripts();
+                            updateLoveTime();
+                            setInterval(updateLoveTime, 1000);
+                            triggerHeartAnimation();
+                            showNextImage();
                         }
 
                         // Wait for user interaction
