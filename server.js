@@ -211,11 +211,6 @@ app.post('/create-checkout-session', async (req, res) => {
             mode: 'payment',
             success_url: `${process.env.BASE_URL}/success.html`,
             cancel_url: `${process.env.BASE_URL}/cancel.html`,
-            custom_text: {
-                submit: {
-                    message: 'Vamos processar seu pagamento'
-                }
-            }
         });
 
         console.log('Stripe session created:', session.id);
@@ -418,11 +413,42 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     #youtube-iframe{
                         margin-top: 60px;
                     }
+
+                    .loading-container {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: ${theme === 'dark' ? '#1f2022' : '#ffffff'};
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 9999;
+                        transition: opacity 0.5s ease-out;
+                    }
+
+                    .loading-container.fade-out {
+                        opacity: 0;
+                        pointer-events: none;
+                    }
+
+                    .heart-3d {
+                        width: 100px;
+                        height: 100px;
+                        animation: pulse 1.5s ease infinite;
+                    }
+
+                    @keyframes pulse {
+                        0% { transform: scale(1); }
+                        50% { transform: scale(1.3); }
+                        100% { transform: scale(1); }
+                    }
                 </style>
             </head>
             <body>
-                    <div class="loading-container">
-                        <div class="heart-3d"></div>
+                    <div class="loading-container" id="loading-screen">
+                        <div class="heart-3d">❤️</div>
                     </div>
                     <div id="image-slideshow"></div>
                     <span class="together-text">Juntos há</span>
@@ -581,6 +607,28 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                                 }, { once: true });
                             }
                         });
+
+                        // Update the loading screen code
+                        window.addEventListener('load', function() {
+                            const loader = document.getElementById('loading-screen');
+                            setTimeout(() => {
+                                loader.classList.add('fade-out');
+                                setTimeout(() => {
+                                    loader.style.display = 'none';
+                                }, 500);
+                            }, 2000);
+                        });
+
+                        // Fallback to hide loading screen if it stays too long
+                        setTimeout(() => {
+                            const loader = document.getElementById('loading-screen');
+                            if (loader && !loader.classList.contains('fade-out')) {
+                                loader.classList.add('fade-out');
+                                setTimeout(() => {
+                                    loader.style.display = 'none';
+                                }, 500);
+                            }
+                        }, 5000);
                         
                     </script>
                 </body>
