@@ -564,12 +564,117 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     ` : ''}
 
                     <script>
-                        // Add this to the beginning of your script section
-                        window.addEventListener('load', function() {
-                            setTimeout(function() {
-                                document.querySelector('.loading-container').classList.add('fade-out');
-                            }, 2000); // Show loading for 2 seconds
+                        // Initialize variables and start preloading immediately
+                        const images = ${JSON.stringify(images)};
+                        let currentImageIndex = 0;
+                        const imageSlideshow = document.getElementById('image-slideshow');
+                        let slideshowInterval;
+                        let contentReady = false;
+                        let allImagesLoaded = 0;
+
+                        // Preload all images
+                        function preloadImages() {
+                            return new Promise((resolve) => {
+                                if (images.length === 0) {
+                                    resolve();
+                                    return;
+                                }
+
+                                images.forEach((src) => {
+                                    const img = new Image();
+                                    img.onload = () => {
+                                        allImagesLoaded++;
+                                        if (allImagesLoaded === images.length) {
+                                            resolve();
+                                        }
+                                    };
+                                    img.src = src;
+                                });
+                            });
+                        }
+
+                        // Initialize page content in background
+                        async function prepareContent() {
+                            // Preload all images
+                            await preloadImages();
+                            
+                            // Prepare first image
+                            if (images.length > 0) {
+                                showNextImage();
+                            }
+
+                            // Initialize YouTube if present
+                            const youtubePlayer = document.getElementById('youtube-iframe');
+                            if (youtubePlayer) {
+                                // Pre-initialize YouTube player
+                                if (typeof YT !== 'undefined') {
+                                    onYouTubeIframeAPIReady();
+                                }
+                            }
+
+                            // Start time counter preparation
+                            updateLoveTime();
+
+                            contentReady = true;
+                        }
+
+                        // Start preparing content immediately
+                        prepareContent();
+
+                        function startPage() {
+                            const heart = document.querySelector('.loading-heart');
+                            const screen = document.querySelector('.loading-screen');
+                            const mainContent = document.querySelector('.main-content');
+                            
+                            // If content isn't ready yet, wait for it
+                            if (!contentReady) {
+                                heart.style.animation = 'pulse 1s infinite';
+                                return;
+                            }
+                            
+                            // Show main content
+                            mainContent.style.display = 'block';
+                            
+                            // Trigger heart explosion
+                            heart.classList.add('explode');
+                            
+                            setTimeout(() => {
+                                screen.classList.add('fade-out');
+                                mainContent.classList.add('visible');
+                                
+                                setTimeout(() => {
+                                    initializePageScripts();
+                                }, 1000);
+                            }, 400);
+                        }
+
+                        // Modified event listeners for loading screen
+                        const loadingScreen = document.querySelector('.loading-screen');
+                        loadingScreen.addEventListener('click', () => {
+                            if (contentReady) {
+                                startPage();
+                            }
                         });
+                        loadingScreen.addEventListener('touchstart', () => {
+                            if (contentReady) {
+                                startPage();
+                            }
+                        });
+
+                        // ...rest of your existing functions (showNextImage, startSlideshow, etc.)...
+
+                        function initializePageScripts() {
+                            if (!slideshowInterval) {
+                                startSlideshow();
+                            }
+                            startHeartAnimations();
+                            setInterval(updateLoveTime, 1000);
+                            
+                            const youtubePlayer = document.getElementById('youtube-iframe');
+                            if (youtubePlayer) {
+                                youtubePlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                            }
+                        }
 
                         function updateLoveTime() {
                             const startDate = new Date("${relationshipDate}T${relationshipTime}");
@@ -586,7 +691,6 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
 
                         // Remove autostart event listeners
                         // Only initialize variables
-                        const images = ${JSON.stringify(images)};
                         let currentImageIndex = 0;
                         const imageSlideshow = document.getElementById('image-slideshow');
                         let slideshowInterval;
