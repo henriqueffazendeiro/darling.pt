@@ -466,7 +466,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
 
                     #loading-text {
                         color: white;
-                        margin-top: 20px;
+                        margin-top: 80px; // Changed from 20px to 80px
                         font-family: 'Rubik', sans-serif;
                     }
 
