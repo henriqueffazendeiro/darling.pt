@@ -564,117 +564,12 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     ` : ''}
 
                     <script>
-                        // Initialize variables and start preloading immediately
-                        const images = ${JSON.stringify(images)};
-                        let currentImageIndex = 0;
-                        const imageSlideshow = document.getElementById('image-slideshow');
-                        let slideshowInterval;
-                        let contentReady = false;
-                        let allImagesLoaded = 0;
-
-                        // Preload all images
-                        function preloadImages() {
-                            return new Promise((resolve) => {
-                                if (images.length === 0) {
-                                    resolve();
-                                    return;
-                                }
-
-                                images.forEach((src) => {
-                                    const img = new Image();
-                                    img.onload = () => {
-                                        allImagesLoaded++;
-                                        if (allImagesLoaded === images.length) {
-                                            resolve();
-                                        }
-                                    };
-                                    img.src = src;
-                                });
-                            });
-                        }
-
-                        // Initialize page content in background
-                        async function prepareContent() {
-                            // Preload all images
-                            await preloadImages();
-                            
-                            // Prepare first image
-                            if (images.length > 0) {
-                                showNextImage();
-                            }
-
-                            // Initialize YouTube if present
-                            const youtubePlayer = document.getElementById('youtube-iframe');
-                            if (youtubePlayer) {
-                                // Pre-initialize YouTube player
-                                if (typeof YT !== 'undefined') {
-                                    onYouTubeIframeAPIReady();
-                                }
-                            }
-
-                            // Start time counter preparation
-                            updateLoveTime();
-
-                            contentReady = true;
-                        }
-
-                        // Start preparing content immediately
-                        prepareContent();
-
-                        function startPage() {
-                            const heart = document.querySelector('.loading-heart');
-                            const screen = document.querySelector('.loading-screen');
-                            const mainContent = document.querySelector('.main-content');
-                            
-                            // If content isn't ready yet, wait for it
-                            if (!contentReady) {
-                                heart.style.animation = 'pulse 1s infinite';
-                                return;
-                            }
-                            
-                            // Show main content
-                            mainContent.style.display = 'block';
-                            
-                            // Trigger heart explosion
-                            heart.classList.add('explode');
-                            
-                            setTimeout(() => {
-                                screen.classList.add('fade-out');
-                                mainContent.classList.add('visible');
-                                
-                                setTimeout(() => {
-                                    initializePageScripts();
-                                }, 1000);
-                            }, 400);
-                        }
-
-                        // Modified event listeners for loading screen
-                        const loadingScreen = document.querySelector('.loading-screen');
-                        loadingScreen.addEventListener('click', () => {
-                            if (contentReady) {
-                                startPage();
-                            }
+                        // Add this to the beginning of your script section
+                        window.addEventListener('load', function() {
+                            setTimeout(function() {
+                                document.querySelector('.loading-container').classList.add('fade-out');
+                            }, 2000); // Show loading for 2 seconds
                         });
-                        loadingScreen.addEventListener('touchstart', () => {
-                            if (contentReady) {
-                                startPage();
-                            }
-                        });
-
-                        // ...rest of your existing functions (showNextImage, startSlideshow, etc.)...
-
-                        function initializePageScripts() {
-                            if (!slideshowInterval) {
-                                startSlideshow();
-                            }
-                            startHeartAnimations();
-                            setInterval(updateLoveTime, 1000);
-                            
-                            const youtubePlayer = document.getElementById('youtube-iframe');
-                            if (youtubePlayer) {
-                                youtubePlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                            }
-                        }
 
                         function updateLoveTime() {
                             const startDate = new Date("${relationshipDate}T${relationshipTime}");
@@ -689,23 +584,9 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                             document.getElementById('love-time').innerHTML = \`<strong>\${years}</strong> anos, <strong>\${months}</strong> meses, <strong>\${days}</strong> dias, <strong> <br> \${hours} </strong> horas, <strong>\${minutes}</strong> minutos, <strong>\${seconds}</strong> segundos\`;                }
                         setInterval(updateLoveTime, 1000);
 
-                        // Remove autostart event listeners
-                        // Only initialize variables
+                        const images = ${JSON.stringify(images)};
                         let currentImageIndex = 0;
                         const imageSlideshow = document.getElementById('image-slideshow');
-                        let slideshowInterval;
-                        let firstImageLoaded = false;
-
-                        // Preload first image
-                        if (images.length > 0) {
-                            const preloadImage = new Image();
-                            preloadImage.onload = () => {
-                                firstImageLoaded = true;
-                                showNextImage(); // Load first image immediately after preload
-                            };
-                            preloadImage.src = images[0];
-                        }
-
                         function showNextImage() {
                             if (images.length > 0) {
                                 const img = document.createElement('img');
@@ -715,26 +596,46 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                                 currentImageIndex = (currentImageIndex + 1) % images.length;
                             }
                         }
+                        setInterval(showNextImage, 5000);
+                        showNextImage();
 
-                        function startSlideshow() {
-                            slideshowInterval = setInterval(showNextImage, 5000);
+                        function triggerHeartAnimation() {
+                            const bubbles = document.querySelectorAll('.bubble');
+                            const order = [0, 2, 1]; // Small, Large, Medium
+                            bubbles.forEach((bubble, index) => {
+                                bubble.style.animation = 'none';
+                                bubble.offsetHeight; // Trigger reflow
+                                bubble.style.animation = \`rise-bubble 5s ease-in-out forwards \${order[index] * 0.5}s\`;
+                            });
                         }
+
+                        // Trigger the animation when the page loads
+                        window.addEventListener('load', triggerHeartAnimation);
+
+                        // Repeat the animation every 15 seconds
+                        setInterval(triggerHeartAnimation, 15000);
+                        
+
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const audio = document.querySelector('audio');
+                            if (audio) {
+                                audio.play().catch(e => console.log("Audio play failed:", e));
+                            }
+                        });
+
+                        window.addEventListener('load', function() {
+                            const audio = document.querySelector('audio');
+                            if (audio) {
+                                document.body.addEventListener('click', function() {
+                                    audio.play().catch(e => console.log("Audio play failed:", e));
+                                }, { once: true });
+                            }
+                        });
+
+                        const loadingScreen = document.querySelector('.loading-screen');
+                        const mainContent = document.querySelector('.main-content');
 
                         function startPage() {
-                            if (!firstImageLoaded && images.length > 0) {
-                                // Wait for first image to load before starting animation
-                                const preloadImage = new Image();
-                                preloadImage.onload = () => {
-                                    firstImageLoaded = true;
-                                    executePageStart();
-                                };
-                                preloadImage.src = images[0];
-                            } else {
-                                executePageStart();
-                            }
-                        }
-
-                        function executePageStart() {
                             const heart = document.querySelector('.loading-heart');
                             const screen = document.querySelector('.loading-screen');
                             const mainContent = document.querySelector('.main-content');
@@ -750,47 +651,36 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                                 screen.classList.add('fade-out');
                                 mainContent.classList.add('visible');
                                 
-                                // Initialize everything after fade completes
+                                // Start page content after fade completes
                                 setTimeout(() => {
+                                    // Initialize all scripts
                                     initializePageScripts();
+                                    
+                                    // Start media playback
+                                    const audio = document.querySelector('audio');
+                                    if (audio) {
+                                        audio.play().catch(e => console.log("Audio play failed:", e));
+                                    }
+
+                                    const youtubePlayer = document.getElementById('youtube-iframe');
+                                    if (youtubePlayer) {
+                                        youtubePlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                                    }
                                 }, 1000);
                             }, 400);
                         }
 
-                        function initializePageScripts() {
-                            // Only start slideshow if not already started
-                            if (!slideshowInterval) {
-                                startSlideshow();
-                            }
-                            startHeartAnimations();
-                            updateLoveTime();
-                            setInterval(updateLoveTime, 1000);
-                            
-                            // Start media playback
-                            const youtubePlayer = document.getElementById('youtube-iframe');
-                            if (youtubePlayer) {
-                                youtubePlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                            }
-                        }
-
                         // Wait for user interaction
-                        const loadingScreen = document.querySelector('.loading-screen');
                         loadingScreen.addEventListener('click', startPage);
                         loadingScreen.addEventListener('touchstart', startPage);
 
-                        function triggerHeartAnimation() {
-                            const bubbles = document.querySelectorAll('.bubble');
-                            const order = [0, 2, 1]; // Small, Large, Medium
-                            bubbles.forEach((bubble, index) => {
-                                bubble.style.animation = 'none';
-                                bubble.offsetHeight;
-                                bubble.style.animation = \`rise-bubble 5s ease-in-out forwards \${order[index] * 0.5}s\`;
-                            });
-                        }
-
-                        function startHeartAnimations() {
+                        function initializePageScripts() {
+                            // Your existing initialization code
+                            updateLoveTime();
+                            setInterval(updateLoveTime, 1000);
                             triggerHeartAnimation();
-                            setInterval(triggerHeartAnimation, 15000);
+                            showNextImage();
+                            // ... rest of your initialization code ...
                         }
                     </script>
                 </div>
