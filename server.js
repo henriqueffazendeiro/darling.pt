@@ -584,9 +584,13 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                             document.getElementById('love-time').innerHTML = \`<strong>\${years}</strong> anos, <strong>\${months}</strong> meses, <strong>\${days}</strong> dias, <strong> <br> \${hours} </strong> horas, <strong>\${minutes}</strong> minutos, <strong>\${seconds}</strong> segundos\`;                }
                         setInterval(updateLoveTime, 1000);
 
+                        // Remove autostart event listeners
+                        // Only initialize variables
                         const images = ${JSON.stringify(images)};
                         let currentImageIndex = 0;
                         const imageSlideshow = document.getElementById('image-slideshow');
+                        let slideshowInterval;
+                        
                         function showNextImage() {
                             if (images.length > 0) {
                                 const img = document.createElement('img');
@@ -596,44 +600,47 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                                 currentImageIndex = (currentImageIndex + 1) % images.length;
                             }
                         }
-                        setInterval(showNextImage, 5000);
-                        showNextImage();
+
+                        function startSlideshow() {
+                            showNextImage(); // Show first image
+                            slideshowInterval = setInterval(showNextImage, 5000);
+                        }
 
                         function triggerHeartAnimation() {
                             const bubbles = document.querySelectorAll('.bubble');
                             const order = [0, 2, 1]; // Small, Large, Medium
                             bubbles.forEach((bubble, index) => {
                                 bubble.style.animation = 'none';
-                                bubble.offsetHeight; // Trigger reflow
+                                bubble.offsetHeight;
                                 bubble.style.animation = \`rise-bubble 5s ease-in-out forwards \${order[index] * 0.5}s\`;
                             });
                         }
 
-                        // Trigger the animation when the page loads
-                        window.addEventListener('load', triggerHeartAnimation);
+                        function startHeartAnimations() {
+                            triggerHeartAnimation();
+                            setInterval(triggerHeartAnimation, 15000);
+                        }
 
-                        // Repeat the animation every 15 seconds
-                        setInterval(triggerHeartAnimation, 15000);
-                        
-
-                        document.addEventListener('DOMContentLoaded', function() {
+                        function initializePageScripts() {
+                            // Start animations and slideshow
+                            startSlideshow();
+                            startHeartAnimations();
+                            
+                            // Start time counter
+                            updateLoveTime();
+                            setInterval(updateLoveTime, 1000);
+                            
+                            // Start media
                             const audio = document.querySelector('audio');
                             if (audio) {
                                 audio.play().catch(e => console.log("Audio play failed:", e));
                             }
-                        });
 
-                        window.addEventListener('load', function() {
-                            const audio = document.querySelector('audio');
-                            if (audio) {
-                                document.body.addEventListener('click', function() {
-                                    audio.play().catch(e => console.log("Audio play failed:", e));
-                                }, { once: true });
+                            const youtubePlayer = document.getElementById('youtube-iframe');
+                            if (youtubePlayer) {
+                                youtubePlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
                             }
-                        });
-
-                        const loadingScreen = document.querySelector('.loading-screen');
-                        const mainContent = document.querySelector('.main-content');
+                        }
 
                         function startPage() {
                             const heart = document.querySelector('.loading-heart');
@@ -651,37 +658,17 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                                 screen.classList.add('fade-out');
                                 mainContent.classList.add('visible');
                                 
-                                // Start page content after fade completes
+                                // Initialize everything after fade completes
                                 setTimeout(() => {
-                                    // Initialize all scripts
                                     initializePageScripts();
-                                    
-                                    // Start media playback
-                                    const audio = document.querySelector('audio');
-                                    if (audio) {
-                                        audio.play().catch(e => console.log("Audio play failed:", e));
-                                    }
-
-                                    const youtubePlayer = document.getElementById('youtube-iframe');
-                                    if (youtubePlayer) {
-                                        youtubePlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                                    }
                                 }, 1000);
                             }, 400);
                         }
 
                         // Wait for user interaction
+                        const loadingScreen = document.querySelector('.loading-screen');
                         loadingScreen.addEventListener('click', startPage);
                         loadingScreen.addEventListener('touchstart', startPage);
-
-                        function initializePageScripts() {
-                            // Your existing initialization code
-                            updateLoveTime();
-                            setInterval(updateLoveTime, 1000);
-                            triggerHeartAnimation();
-                            showNextImage();
-                            // ... rest of your initialization code ...
-                        }
                     </script>
                 </div>
             </body>
