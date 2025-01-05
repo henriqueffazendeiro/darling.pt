@@ -443,6 +443,19 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         opacity: 1;
                     }
 
+                    .tap-to-start {
+                        margin-top: 40px;
+                        font-size: 18px;
+                        color: ${theme === 'dark' ? '#ffffff' : '#000000'};
+                        animation: pulse 1.5s infinite;
+                    }
+
+                    @keyframes pulse {
+                        0% { transform: scale(1); opacity: 1; }
+                        50% { transform: scale(1.1); opacity: 0.8; }
+                        100% { transform: scale(1); opacity: 1; }
+                    }
+
                 </style>
             </head>
             <body>
