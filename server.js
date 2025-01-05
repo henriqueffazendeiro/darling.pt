@@ -97,7 +97,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) =
                 if (page) break;
                 
                 console.log(`Tentativa ${attempts + 1}: Aguardando dados da página...`);
-                await new Promise(resolve => setTimeout(resolve, 2000)); // Espera 2 segundos
+                await new Promise(resolve => setTimeout(resolve, 0)); // Espera 2 segundos
                 attempts++;
             }
 
@@ -200,7 +200,7 @@ app.post('/create-checkout-session', async (req, res) => {
             payment_method_types: ['card'],
             line_items: [{
                 price_data: {
-                    currency: 'usd',
+                    currency: 'eur', // Changed from 'usd' to 'eur'
                     product_data: {
                         name: `Plano ${plan.charAt(0).toUpperCase() + plan.slice(1)}`,
                     },
@@ -211,7 +211,6 @@ app.post('/create-checkout-session', async (req, res) => {
             mode: 'payment',
             success_url: `${process.env.BASE_URL}/success.html`,
             cancel_url: `${process.env.BASE_URL}/cancel.html`,
-            // Remove payment_method_options since we don't need to save cards
         });
 
         console.log('Stripe session created:', session.id);
