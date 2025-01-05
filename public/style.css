@@ -300,6 +300,12 @@ h2 {
     margin-bottom: 100px;
 }
 
+.faq-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
 .faq-item {
     border-bottom: 1px solid #eee;
     margin-bottom: 15px;
@@ -652,7 +658,39 @@ footer {
     }
 
     .faq{
-        margin-top: -150px;
+        width: 100%;
+        margin-top: 50px; /* Reduced from -150px */
+        padding: 0 20px;
+    }
+
+    .faq h2 {
+        margin-top: 50px; /* Reduced from 200px */
+        margin-bottom: 50px;
+        font-size: 40px;
+    }
+
+    .faq-container {
+        width: 100%;
+        padding: 0;
+    }
+
+    .faq-item {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .faq-question {
+        padding: 15px 10px;
+        font-size: 16px;
+    }
+
+    .faq-answer {
+        padding: 0 10px;
+        font-size: 14px;
+    }
+
+    .faq-item.active .faq-answer {
+        padding: 15px 10px;
     }
 
     .faq-question {
