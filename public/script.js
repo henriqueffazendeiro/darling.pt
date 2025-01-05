@@ -281,15 +281,45 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Remove the theme selector functionality
-    /*
+    // Add theme selector functionality
     const themeBalls = document.querySelectorAll('.theme-ball');
+    const previewContent = document.querySelector('.preview-content');
+    const previewWrapper = document.querySelector('.preview-container');
+    const previewTools = document.querySelector('.preview-tools');
+    const previewSeparator = document.querySelector('.preview-separator');
+    const togetherText = document.querySelector('.together-text');
+    const previewTime = document.querySelector('.preview-time');
+    const previewMessage = document.querySelector('.preview-message');
+    const previewImageContainer = document.querySelector('.preview-image-container');
+    
     themeBalls.forEach(ball => {
         ball.addEventListener('click', function() {
-            // ... theme changing code ...
+            themeBalls.forEach(b => b.classList.remove('selected'));
+            this.classList.add('selected');
+            
+            if (this.classList.contains('white')) {
+                previewContent.style.backgroundColor = '#fff0f3';
+                previewWrapper.style.backgroundColor = '#fff0f3';
+                previewTools.style.backgroundColor = '#fff0f3';
+                previewContent.style.color = '#333';
+                previewSeparator.style.borderColor = '#000';
+                togetherText.style.color = '#666';
+                previewTime.style.color = '#000';
+                previewMessage.style.color = '#000';
+                previewImageContainer.style.border = '2px solid #000';
+            } else {
+                // Removendo todos os estilos inline para voltar ao estilo original do CSS
+                previewContent.removeAttribute('style');
+                previewWrapper.removeAttribute('style');
+                previewTools.removeAttribute('style');
+                previewSeparator.removeAttribute('style');
+                togetherText.removeAttribute('style');
+                previewTime.removeAttribute('style');
+                previewMessage.removeAttribute('style');
+                previewImageContainer.removeAttribute('style');
+            }
         });
-    }); 
-    */
+    });
 });
 
 // Gerencia o redirecionamento para o checkout
