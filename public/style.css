@@ -367,6 +367,12 @@ footer {
     margin-top: 150px;
     border-top: 2px solid #ff4343;
     padding-top: 20px;
+    font-family: rubik;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    position: relative;
+    left: 0;
+    right: 0;
 }
 
 .footer-content {
