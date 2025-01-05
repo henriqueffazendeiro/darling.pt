@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const createPageButton = document.getElementById('create-page-button');
     const priceOptions = document.querySelectorAll('.price-option');
     const previewContainer = document.querySelector('.preview-image-container');
+    let currentSlideInterval; // Add this at the top with other constants
 
     // Função para validar o formulário
     const validateForm = () => {
@@ -71,10 +72,32 @@ document.addEventListener('DOMContentLoaded', function () {
             photoLabel.textContent = 'Escolher fotos de casal (máximo 5)';
             musicUpload.style.display = 'none';
         }
+
+        // Stop any existing slideshow
+        if (currentSlideInterval) {
+            clearInterval(currentSlideInterval);
+            currentSlideInterval = null;
+        }
+
+        // Clear file input and preview
+        fileInput.value = '';
+        previewContainer.innerHTML = '';
+        
+        // Remove navigation buttons if they exist
+        const existingButtons = previewContainer.querySelectorAll('.nav-button');
+        existingButtons.forEach(button => button.remove());
     };
 
     priceOptions.forEach(option => {
         option.addEventListener('click', () => {
+            // Clear file input and preview
+            fileInput.value = '';
+            previewContainer.innerHTML = '';
+            
+            // Update validation state
+            validateForm();
+            
+            // Call existing selectPrice function
             selectPrice(option);
         });
     });
@@ -120,10 +143,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Gerenciar preview de imagens
     fileInput.addEventListener('change', function(e) {
+        // Stop any existing slideshow
+        if (currentSlideInterval) {
+            clearInterval(currentSlideInterval);
+            currentSlideInterval = null;
+        }
+
         const maxPhotos = document.querySelector('.price-option.selected').id === '2' ? 10 : 5;
         if (this.files.length > maxPhotos) {
             alert(`Você pode selecionar no máximo ${maxPhotos} fotos neste plano.`);
             this.value = '';
+            previewContainer.innerHTML = '';
             return;
         }
 
@@ -179,7 +209,12 @@ document.addEventListener('DOMContentLoaded', function () {
         function startSlideshow() {
             if (files.length <= 1) return;
             
-            slideInterval = setInterval(() => {
+            // Clear any existing interval before setting a new one
+            if (currentSlideInterval) {
+                clearInterval(currentSlideInterval);
+            }
+            
+            currentSlideInterval = setInterval(() => {
                 currentIndex = (currentIndex + 1) % files.length;
                 showImage(currentIndex);
             }, 5000); // Changed to 5 seconds

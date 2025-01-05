@@ -394,33 +394,57 @@
 
         // Update the price selection function to show/hide YouTube input
         function selectPrice(element, maxPhotos) {
-            // Remove selected class from all options
-            document.querySelectorAll('.price-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-
-            // Add selected class to clicked option
+            // Clear existing selection
+            document.querySelectorAll('.price-option').forEach(opt => opt.classList.remove('selected'));
             element.classList.add('selected');
 
-            // Update file input label
-            document.getElementById('photo-label').textContent = `Escolher fotos de casal (máximo ${maxPhotos})`;
-
-            // Show/hide YouTube URL input based on plan
+            // Get elements
+            const fileInput = document.getElementById('file-input');
+            const previewContainer = document.querySelector('.preview-image-container');
+            const photoLabel = document.getElementById('photo-label');
             const musicUpload = document.querySelector('.music-upload');
             const youtubeEmbed = document.getElementById('youtube-embed');
+            const youtubeUrlInput = document.getElementById('youtube-url');
 
-            if (maxPhotos === 10) { // Premium plan
+            // Stop any existing slideshow
+            if (window.currentSlideInterval) {
+                clearInterval(window.currentSlideInterval);
+                window.currentSlideInterval = null;
+            }
+
+            // Clear inputs and preview
+            fileInput.value = '';
+            previewContainer.innerHTML = '';
+
+            // Remove any existing navigation buttons
+            const existingButtons = previewContainer.querySelectorAll('.nav-button');
+            existingButtons.forEach(button => button.remove());
+
+            // Update photo label
+            photoLabel.textContent = `Escolher fotos de casal (máximo ${maxPhotos})`;
+
+            // Handle YouTube elements
+            if (maxPhotos === 10) {
                 musicUpload.style.display = 'block';
                 youtubeEmbed.style.display = 'block';
             } else {
+                // Clear YouTube URL input
+                youtubeUrlInput.value = '';
+
+                // Stop and remove YouTube iframe if it exists
+                const existingIframe = youtubeEmbed.querySelector('iframe');
+                if (existingIframe) {
+                    existingIframe.src = '';
+                    existingIframe.remove();
+                }
+
+                // Hide YouTube elements
                 musicUpload.style.display = 'none';
                 youtubeEmbed.style.display = 'none';
-                document.getElementById('youtube-url').value = ''; // Clear URL
+                youtubeEmbed.innerHTML = '';
             }
-
-            // Reload the page preview
-            location.reload();
         }
+
     </script>
 </body>
 
