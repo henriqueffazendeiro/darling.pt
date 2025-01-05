@@ -211,6 +211,52 @@ app.post('/create-checkout-session', async (req, res) => {
             mode: 'payment',
             success_url: `${process.env.BASE_URL}/success.html`,
             cancel_url: `${process.env.BASE_URL}/cancel.html`,
+            custom_text: {
+                submit: {
+                    message: 'Vamos processar seu pagamento'
+                }
+            },
+            payment_intent_data: {
+                setup_future_usage: 'off_session',
+            },
+            appearance: {
+                theme: 'stripe',
+                variables: {
+                    colorPrimary: '#FF0000',
+                    colorBackground: '#ffffff',
+                    colorText: '#000000',
+                    colorDanger: '#FF0000',
+                    fontFamily: 'Rubik, system-ui, sans-serif',
+                    spacingUnit: '4px',
+                    borderRadius: '4px',
+                },
+                rules: {
+                    '.Tab': {
+                        border: '1px solid #E0E6EB',
+                        boxShadow: '0px 1px 1px rgba(0, 0, 0, 0.03)',
+                    },
+                    '.Tab:hover': {
+                        color: '#FF0000',
+                    },
+                    '.Tab--selected': {
+                        borderColor: '#FF0000',
+                        color: '#FF0000',
+                    },
+                    '.Input': {
+                        border: '1px solid #E0E6EB',
+                    },
+                    '.Input:focus': {
+                        borderColor: '#FF0000',
+                    },
+                    '.Button': {
+                        backgroundColor: '#FF0000',
+                        color: '#ffffff',
+                    },
+                    '.Button:hover': {
+                        backgroundColor: '#cc0000',
+                    }
+                }
+            }
         });
 
         console.log('Stripe session created:', session.id);
