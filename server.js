@@ -590,7 +590,18 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         let currentImageIndex = 0;
                         const imageSlideshow = document.getElementById('image-slideshow');
                         let slideshowInterval;
-                        
+                        let firstImageLoaded = false;
+
+                        // Preload first image
+                        if (images.length > 0) {
+                            const preloadImage = new Image();
+                            preloadImage.onload = () => {
+                                firstImageLoaded = true;
+                                showNextImage(); // Load first image immediately after preload
+                            };
+                            preloadImage.src = images[0];
+                        }
+
                         function showNextImage() {
                             if (images.length > 0) {
                                 const img = document.createElement('img');
@@ -602,47 +613,24 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         }
 
                         function startSlideshow() {
-                            showNextImage(); // Show first image
                             slideshowInterval = setInterval(showNextImage, 5000);
                         }
 
-                        function triggerHeartAnimation() {
-                            const bubbles = document.querySelectorAll('.bubble');
-                            const order = [0, 2, 1]; // Small, Large, Medium
-                            bubbles.forEach((bubble, index) => {
-                                bubble.style.animation = 'none';
-                                bubble.offsetHeight;
-                                bubble.style.animation = \`rise-bubble 5s ease-in-out forwards \${order[index] * 0.5}s\`;
-                            });
-                        }
-
-                        function startHeartAnimations() {
-                            triggerHeartAnimation();
-                            setInterval(triggerHeartAnimation, 15000);
-                        }
-
-                        function initializePageScripts() {
-                            // Start animations and slideshow
-                            startSlideshow();
-                            startHeartAnimations();
-                            
-                            // Start time counter
-                            updateLoveTime();
-                            setInterval(updateLoveTime, 1000);
-                            
-                            // Start media
-                            const audio = document.querySelector('audio');
-                            if (audio) {
-                                audio.play().catch(e => console.log("Audio play failed:", e));
-                            }
-
-                            const youtubePlayer = document.getElementById('youtube-iframe');
-                            if (youtubePlayer) {
-                                youtubePlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                            }
-                        }
-
                         function startPage() {
+                            if (!firstImageLoaded && images.length > 0) {
+                                // Wait for first image to load before starting animation
+                                const preloadImage = new Image();
+                                preloadImage.onload = () => {
+                                    firstImageLoaded = true;
+                                    executePageStart();
+                                };
+                                preloadImage.src = images[0];
+                            } else {
+                                executePageStart();
+                            }
+                        }
+
+                        function executePageStart() {
                             const heart = document.querySelector('.loading-heart');
                             const screen = document.querySelector('.loading-screen');
                             const mainContent = document.querySelector('.main-content');
@@ -665,10 +653,41 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                             }, 400);
                         }
 
+                        function initializePageScripts() {
+                            // Only start slideshow if not already started
+                            if (!slideshowInterval) {
+                                startSlideshow();
+                            }
+                            startHeartAnimations();
+                            updateLoveTime();
+                            setInterval(updateLoveTime, 1000);
+                            
+                            // Start media playback
+                            const youtubePlayer = document.getElementById('youtube-iframe');
+                            if (youtubePlayer) {
+                                youtubePlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                            }
+                        }
+
                         // Wait for user interaction
                         const loadingScreen = document.querySelector('.loading-screen');
                         loadingScreen.addEventListener('click', startPage);
                         loadingScreen.addEventListener('touchstart', startPage);
+
+                        function triggerHeartAnimation() {
+                            const bubbles = document.querySelectorAll('.bubble');
+                            const order = [0, 2, 1]; // Small, Large, Medium
+                            bubbles.forEach((bubble, index) => {
+                                bubble.style.animation = 'none';
+                                bubble.offsetHeight;
+                                bubble.style.animation = \`rise-bubble 5s ease-in-out forwards \${order[index] * 0.5}s\`;
+                            });
+                        }
+
+                        function startHeartAnimations() {
+                            triggerHeartAnimation();
+                            setInterval(triggerHeartAnimation, 15000);
+                        }
                     </script>
                 </div>
             </body>
