@@ -211,9 +211,10 @@ app.post('/create-checkout-session', async (req, res) => {
             mode: 'payment',
             success_url: `${process.env.BASE_URL}/success.html`,
             cancel_url: `${process.env.BASE_URL}/cancel.html`,
+            // Optional: Force card-only UI
             payment_method_options: {
                 card: {
-                    setup_future_usage: 'off'  // Disable saving payment method
+                    setup_future_usage: 'off' // Disable future usage option
                 }
             }
         });
