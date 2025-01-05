@@ -427,61 +427,46 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         z-index: 1000;
                     }
 
-                    .loading-screen.hidden {
-                        display: none;
+                    .loader {
+                        position: relative;
+                        width: 40px;
+                        height: 60px;
+                        animation: heartBeat 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+                        margin: 0 auto;
                     }
 
-                    .loading-heart {
-                        color: red;
-                        font-size: 50px;
-                        animation: pulse 1s infinite;
-                    }
-
-                    .tap-to-start {
-                        margin-top: 20px;
-                        font-size: 18px;
-                        color: ${theme === 'dark' ? '#ffffff' : '#000000'};
-                    }
-
-                    @keyframes pulse {
-                        0% { transform: scale(1); }
-                        50% { transform: scale(1.2); }
-                        100% { transform: scale(1); }
-                    }
-
-                    .main-content {
-                        display: none;
-                    }
-
-                    .main-content.visible {
-                        display: block;
-                    }
-
-                    .loading-container {
-                        position: fixed;
-                        top: 0;
+                    .loader:before,
+                    .loader:after {
+                        content: "";
+                        background: red;
+                        width: 40px;
+                        height: 60px;
+                        border-radius: 50px 50px 0 0;
+                        position: absolute;
                         left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background-color: ${theme === 'dark' ? '#1f2022' : '#ffffff'};
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        z-index: 1000;
+                        bottom: 0;
+                        transform: rotate(45deg);
+                        transform-origin: 50% 68%;
+                        box-shadow: 5px 4px 5px #0004 inset;
                     }
 
-                    .loading-content {
-                        text-align: center;
+                    .loader:after {
+                        transform: rotate(-45deg);
+                    }
+
+                    @keyframes heartBeat {
+                        0% { transform: scale(0.95); }
+                        5% { transform: scale(1.1); }
+                        39% { transform: scale(0.85); }
+                        45% { transform: scale(1); }
+                        60% { transform: scale(0.95); }
+                        100% { transform: scale(0.9); }
                     }
 
                     .tap-to-start {
-                        margin-top: 20px;
+                        margin-top: 40px;
                         font-size: 18px;
                         color: ${theme === 'dark' ? '#ffffff' : '#000000'};
-                        position: fixed;
-                        bottom: 50px;
-                        left: 50%;
-                        transform: translateX(-50%);
                     }
 
                     .main-content {
@@ -494,11 +479,9 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                 </style>
             </head>
             <body>
-                <div class="loading-container" id="loading-screen">
-                    <div class="loading-content">
-                        <div class="loader"></div>
-                    </div>
-                    <div class="tap-to-start">Toque para começar</div>
+                <div class="loading-screen">
+                    <div class="loader"></div>
+                    <div class="tap-to-start">Toque na tela para começar</div>
                 </div>
 
                 <div class="main-content">
