@@ -395,64 +395,31 @@
         // Update the price selection function to show/hide YouTube input
         function selectPrice(element, maxPhotos) {
             // Remove selected class from all options
-            document.querySelectorAll('.price-option').forEach(option => {
-                option.classList.remove('selected');
+            document.querySelectorAll('.price-option').forEach(opt => {
+                opt.classList.remove('selected');
             });
 
             // Add selected class to clicked option
             element.classList.add('selected');
 
-            // Update photo label
+            // Update file input label
             document.getElementById('photo-label').textContent = `Escolher fotos de casal (máximo ${maxPhotos})`;
-
-            // Reset all form inputs
-            document.getElementById('couple-form').reset();
-
-            // Clear preview content
-            clearAllPreviews();
 
             // Show/hide YouTube URL input based on plan
             const musicUpload = document.querySelector('.music-upload');
             const youtubeEmbed = document.getElementById('youtube-embed');
 
-            if (maxPhotos === 10) {
+            if (maxPhotos === 10) { // Premium plan
                 musicUpload.style.display = 'block';
                 youtubeEmbed.style.display = 'block';
             } else {
                 musicUpload.style.display = 'none';
                 youtubeEmbed.style.display = 'none';
-            }
-        }
-
-        // Add new function to clear all previews
-        function clearAllPreviews() {
-            // Reset image preview
-            const previewImageContainer = document.querySelector('.preview-image-container');
-            if (previewImageContainer) {
-                previewImageContainer.innerHTML = '<img class="preview-image" src="" onload="handleImageLoad(this)">';
+                document.getElementById('youtube-url').value = ''; // Clear URL
             }
 
-            // Reset time counters
-            ['years', 'months', 'days', 'hours', 'minutes', 'seconds'].forEach(unit => {
-                const element = document.getElementById(`preview-${unit}`);
-                if (element) element.textContent = '0';
-            });
-
-            // Reset message
-            const previewMessage = document.getElementById('preview-message');
-            if (previewMessage) previewMessage.textContent = '';
-
-            // Reset YouTube embed
-            const youtubeEmbed = document.getElementById('youtube-embed');
-            if (youtubeEmbed) {
-                youtubeEmbed.innerHTML = '';
-                youtubeEmbed.style.display = 'none';
-            }
-
-            // Stop any running interval for time updates
-            if (window.timeUpdateInterval) {
-                clearInterval(window.timeUpdateInterval);
-            }
+            // Reload the page preview
+            location.reload();
         }
     </script>
 </body>
