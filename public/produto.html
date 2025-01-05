@@ -406,42 +406,52 @@
             document.getElementById('photo-label').textContent = `Escolher fotos de casal (máximo ${maxPhotos})`;
 
             // Reset all form inputs
-            document.getElementById('couple-names').value = '';
-            document.getElementById('relationship-date').value = '';
-            document.getElementById('relationship-time').value = '';
-            document.getElementById('message').value = '';
-            document.getElementById('file-input').value = '';
-            document.getElementById('youtube-url').value = '';
+            document.getElementById('couple-form').reset();
 
-            // Reset preview elements
-            document.querySelector('.preview-image').src = '';
-            document.getElementById('preview-message').textContent = '';
-            document.getElementById('youtube-embed').innerHTML = '';
-
-            // Reset time preview
-            document.getElementById('preview-years').textContent = '0';
-            document.getElementById('preview-months').textContent = '0';
-            document.getElementById('preview-days').textContent = '0';
-            document.getElementById('preview-hours').textContent = '0';
-            document.getElementById('preview-minutes').textContent = '0';
-            document.getElementById('preview-seconds').textContent = '0';
-
-            // Clear image preview container
-            const previewImageContainer = document.querySelector('.preview-image-container');
-            if (previewImageContainer) {
-                previewImageContainer.innerHTML = '<img class="preview-image" src="" onload="handleImageLoad(this)">';
-            }
+            // Clear preview content
+            clearAllPreviews();
 
             // Show/hide YouTube URL input based on plan
             const musicUpload = document.querySelector('.music-upload');
             const youtubeEmbed = document.getElementById('youtube-embed');
 
-            if (maxPhotos === 10) { // Premium plan
+            if (maxPhotos === 10) {
                 musicUpload.style.display = 'block';
                 youtubeEmbed.style.display = 'block';
             } else {
                 musicUpload.style.display = 'none';
                 youtubeEmbed.style.display = 'none';
+            }
+        }
+
+        // Add new function to clear all previews
+        function clearAllPreviews() {
+            // Reset image preview
+            const previewImageContainer = document.querySelector('.preview-image-container');
+            if (previewImageContainer) {
+                previewImageContainer.innerHTML = '<img class="preview-image" src="" onload="handleImageLoad(this)">';
+            }
+
+            // Reset time counters
+            ['years', 'months', 'days', 'hours', 'minutes', 'seconds'].forEach(unit => {
+                const element = document.getElementById(`preview-${unit}`);
+                if (element) element.textContent = '0';
+            });
+
+            // Reset message
+            const previewMessage = document.getElementById('preview-message');
+            if (previewMessage) previewMessage.textContent = '';
+
+            // Reset YouTube embed
+            const youtubeEmbed = document.getElementById('youtube-embed');
+            if (youtubeEmbed) {
+                youtubeEmbed.innerHTML = '';
+                youtubeEmbed.style.display = 'none';
+            }
+
+            // Stop any running interval for time updates
+            if (window.timeUpdateInterval) {
+                clearInterval(window.timeUpdateInterval);
             }
         }
     </script>
