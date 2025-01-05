@@ -7,6 +7,44 @@ document.addEventListener('DOMContentLoaded', function () {
     const createPageButton = document.getElementById('create-page-button');
     const priceOptions = document.querySelectorAll('.price-option');
 
+    // Função para selecionar o plano
+    function selectPrice(element) {
+        priceOptions.forEach(option => option.classList.remove('selected'));
+        element.classList.add('selected');
+        
+        // Atualizar a visibilidade do input de música
+        const musicUpload = document.querySelector('.music-upload');
+        if (element.id === '2') {
+            musicUpload.style.display = 'block';
+        } else {
+            musicUpload.style.display = 'none';
+        }
+    }
+
+    // Adicionar evento de clique para cada opção de preço
+    priceOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            selectPrice(option);
+        });
+    });
+
+    // Verificar parâmetro na URL e selecionar plano apropriado
+    const urlParams = new URLSearchParams(window.location.search);
+    const planParam = urlParams.get('plan');
+    
+    if (planParam === 'premium') {
+        const premiumOption = document.getElementById('2');
+        if (premiumOption) {
+            selectPrice(premiumOption);
+        }
+    } else {
+        // Selecionar plano básico por padrão
+        const basicOption = document.getElementById('1');
+        if (basicOption) {
+            selectPrice(basicOption);
+        }
+    }
+
     // Função para validar o formulário
     const validateForm = () => {
         const isFormValid = [fileInput, dateInput, timeInput, messageInput].every(input => {
@@ -47,18 +85,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const updatePreviewMessage = () => {
         document.getElementById('preview-message').textContent = messageInput.value;
     };
-
-    // Função para gerenciar a seleção de planos
-    const selectPrice = (element) => {
-        priceOptions.forEach(option => option.classList.remove('selected'));
-        element.classList.add('selected');
-    };
-
-    priceOptions.forEach(option => {
-        option.addEventListener('click', () => {
-            selectPrice(option);
-        });
-    });
 
     // Adiciona eventos para validar o formulário e atualizar o preview
     [fileInput, dateInput, timeInput, messageInput].forEach(input => {
@@ -105,3 +131,4 @@ document.getElementById('create-page-button').addEventListener('click', async (e
         alert('Erro ao criar sessão de pagamento.');
     }
 });
+

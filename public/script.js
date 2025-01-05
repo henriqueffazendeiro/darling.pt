@@ -85,6 +85,24 @@ document.addEventListener('DOMContentLoaded', function () {
         selectPrice(firstPriceOption);
     }
 
+    // Check URL parameters for plan selection
+    const urlParams = new URLSearchParams(window.location.search);
+    const plan = urlParams.get('plan');
+    
+    // Select the appropriate price option based on URL parameter
+    if (plan === 'premium') {
+        const premiumOption = document.querySelector('.price-option[id="2"]');
+        if (premiumOption) {
+            selectPrice(premiumOption);
+        }
+    } else {
+        // Default selection (Basic plan)
+        const basicOption = document.querySelector('.price-option[id="1"]');
+        if (basicOption) {
+            selectPrice(basicOption);
+        }
+    }
+
     // Adiciona eventos para validar o formulário e atualizar o preview
     [fileInput, dateInput, timeInput, messageInput].forEach(input => {
         input.addEventListener('input', validateForm);

@@ -97,12 +97,9 @@
                         </div>
 
                         <div class="music-upload" style="display: none;">
-                            <input type="url" 
-                                   id="youtube-url" 
-                                   name="youtube-url" 
-                                   class="youtube-input" 
-                                   placeholder="Cole o link da música aqui"
-                                   pattern="^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$">
+                            <input type="url" id="youtube-url" name="youtube-url" class="youtube-input"
+                                placeholder="Cole o link da música aqui"
+                                pattern="^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$">
                         </div>
 
 
@@ -352,10 +349,10 @@
         }
 
         // Add YouTube URL input event listener
-        document.getElementById('youtube-url').addEventListener('input', function(e) {
+        document.getElementById('youtube-url').addEventListener('input', function (e) {
             const youtubeUrl = e.target.value;
             const youtubeEmbed = document.getElementById('youtube-embed');
-            
+
             if (isValidYoutubeUrl(youtubeUrl)) {
                 const videoId = getYoutubeVideoId(youtubeUrl);
                 if (videoId) {
@@ -378,10 +375,10 @@
         });
 
         // Update the YouTube URL input event listener
-        document.getElementById('youtube-url').addEventListener('input', function(e) {
+        document.getElementById('youtube-url').addEventListener('input', function (e) {
             const youtubeUrl = e.target.value;
             const youtubeEmbed = document.getElementById('youtube-embed');
-            
+
             if (isValidYoutubeUrl(youtubeUrl)) {
                 const videoId = getYoutubeVideoId(youtubeUrl);
                 if (videoId) {
@@ -406,11 +403,11 @@
         // Update the price selection function to show/hide YouTube input
         function selectPrice(element, maxPhotos) {
             // ...existing price selection code...
-            
+
             // Show/hide YouTube URL input based on plan
             const musicUpload = document.querySelector('.music-upload');
             const youtubeEmbed = document.getElementById('youtube-embed');
-            
+
             if (maxPhotos === 10) { // Premium plan
                 musicUpload.style.display = 'block';
                 youtubeEmbed.style.display = 'block';
