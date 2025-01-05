@@ -413,40 +413,79 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     #youtube-iframe{
                         margin-top: 60px;
                     }
-                    .main-content {
-                        display: none;
-                    }
-                    .click-to-continue {
+
+                    /* Loading screen styles */
+                    #loading-screen {
                         position: fixed;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        text-align: center;
-                        color: #333;
-                        font-family: 'Rubik', sans-serif;
-                        display: none;
-                        cursor: pointer;
-                        z-index: 10000;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-color: #1f2022;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 9999;
                     }
-                    .click-to-continue p {
-                        font-size: 18px;
+
+                    .loader {
+                        position: relative;
+                        width: 40px;
+                        height: 60px;
+                        animation: heartBeat 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+                        margin: 0 auto;
+                    }
+
+                    .loader:before, .loader:after {
+                        content: "";
+                        background: red;
+                        width: 40px;
+                        height: 60px;
+                        border-radius: 50px 50px 0 0;
+                        position: absolute;
+                        left: 0;
+                        bottom: 0;
+                        transform: rotate(45deg);
+                        transform-origin: 50% 68%;
+                        box-shadow: 5px 4px 5px #0004 inset;
+                    }
+
+                    .loader:after {
+                        transform: rotate(-45deg);
+                    }
+
+                    @keyframes heartBeat {
+                        0% { transform: scale(0.95); }
+                        5% { transform: scale(1.1); }
+                        39% { transform: scale(0.85); }
+                        45% { transform: scale(1); }
+                        60% { transform: scale(0.95); }
+                        100% { transform: scale(0.9); }
+                    }
+
+                    #loading-text {
+                        color: white;
                         margin-top: 20px;
+                        font-family: 'Rubik', sans-serif;
+                    }
+
+                    #main-content {
+                        display: none;
                     }
                 </style>
             </head>
             <body>
-                <div class="loading-container" id="loading-screen">
+                <div id="loading-screen">
                     <div class="loader"></div>
-                    <div class="click-to-continue" id="click-prompt">
-                        <p>Clique para continuar</p>
-                    </div>
+                    <div id="loading-text">Toque para abrir</div>
                 </div>
-                
-                <div class="main-content">
+
+                <div id="main-content">
+                    <!-- Your existing content here -->
                     <div id="image-slideshow"></div>
                     <span class="together-text">Juntos há</span>
                     <div class="time" id="love-time"></div>
-                   
                     <div class="preview-bubbles">
                         <div class="bubble heart-small">❤️</div>
                         <div class="bubble heart-medium">❤️</div>
@@ -600,46 +639,27 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                                 }, { once: true });
                             }
                         });
+
+                        // Loading screen interaction
+                        document.getElementById('loading-screen').addEventListener('click', function() {
+                            this.style.display = 'none';
+                            document.getElementById('main-content').style.display = 'block';
+                            
+                            // Start all your existing functionality
+                            updateLoveTime();
+                            showNextImage();
+                            triggerHeartAnimation();
+                            
+                            // If you have audio/YouTube, start it here
+                            const audio = document.querySelector('audio');
+                            if (audio) {
+                                audio.play().catch(e => console.log("Audio play failed:", e));
+                            }
+                        });
                         
                     </script>
-                </div>
-                <script>
-                    window.addEventListener('load', function() {
-                        const loadingScreen = document.getElementById('loading-screen');
-                        const clickPrompt = document.getElementById('click-prompt');
-                        const mainContent = document.querySelector('.main-content');
-                        
-                        // Show click prompt after 2 seconds
-                        setTimeout(() => {
-                            clickPrompt.style.display = 'block';
-                        }, 2000);
-
-                        // Handle click to continue
-                        loadingScreen.addEventListener('click', function() {
-                            loadingScreen.classList.add('fade-out');
-                            mainContent.style.display = 'block';
-                            setTimeout(() => {
-                                loadingScreen.style.display = 'none';
-                            }, 500);
-                            
-                            // Initialize all other functionalities
-                            initializePage();
-                        });
-                    });
-
-                    function initializePage() {
-                        // Move all existing JavaScript functionality here
-                        function updateLoveTime() {
-                            // ...existing updateLoveTime code...
-                        }
-                        setInterval(updateLoveTime, 1000);
-                        updateLoveTime();
-
-                        // ...rest of the existing JavaScript...
-                    }
-                </script>
-            </body>
-            </html>
+                </body>
+                </html>
         `);
     } catch (error) {
         console.error('Erro ao servir página:', error);
