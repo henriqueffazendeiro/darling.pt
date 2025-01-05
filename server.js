@@ -425,45 +425,36 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         justify-content: center;
                         align-items: center;
                         z-index: 1000;
-                        opacity: 1;
-                        transition: opacity 1s ease-out;
                     }
 
-                    .loading-screen.fade-out {
-                        opacity: 0;
-                        pointer-events: none;
+                    .loading-screen.hidden {
+                        display: none;
+                    }
+
+                    .loading-heart {
+                        color: red;
+                        font-size: 50px;
+                        animation: pulse 1s infinite;
+                    }
+
+                    .tap-to-start {
+                        margin-top: 20px;
+                        font-size: 18px;
+                        color: ${theme === 'dark' ? '#ffffff' : '#000000'};
+                    }
+
+                    @keyframes pulse {
+                        0% { transform: scale(1); }
+                        50% { transform: scale(1.2); }
+                        100% { transform: scale(1); }
                     }
 
                     .main-content {
-                        opacity: 0;
-                        transition: opacity 1s ease-in;
+                        display: none;
                     }
 
                     .main-content.visible {
-                        opacity: 1;
-                    }
-
-                    @keyframes explode {
-                        0% { transform: scale(1); opacity: 1; }
-                        50% { transform: scale(2.5); opacity: 0.5; }
-                        100% { transform: scale(4); opacity: 0; }
-                    }
-
-                    @keyframes fadeOut {
-                        0% { opacity: 1; }
-                        100% { opacity: 0; visibility: hidden; }
-                    }
-
-                    .loading-screen.fade-out {
-                        animation: fadeOut 1s forwards;
-                    }
-
-                    .loading-heart.explode {
-                        animation: explode 0.8s forwards;
-                    }
-
-                    .loading-screen {
-                        transition: opacity 1s;
+                        display: block;
                     }
                 </style>
             </head>
@@ -636,38 +627,23 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         const mainContent = document.querySelector('.main-content');
 
                         function startPage() {
-                            const heart = document.querySelector('.loading-heart');
-                            const screen = document.querySelector('.loading-screen');
-                            const mainContent = document.querySelector('.main-content');
+                            loadingScreen.classList.add('hidden');
+                            mainContent.classList.add('visible');
                             
-                            // Show main content first but keep it transparent
-                            mainContent.style.display = 'block';
-                            
-                            // Trigger heart explosion
-                            heart.classList.add('explode');
-                            
-                            // Start fade transition after heart explosion
-                            setTimeout(() => {
-                                screen.classList.add('fade-out');
-                                mainContent.classList.add('visible');
-                                
-                                // Start page content after fade completes
-                                setTimeout(() => {
-                                    // Initialize all scripts
-                                    initializePageScripts();
-                                    
-                                    // Start media playback
-                                    const audio = document.querySelector('audio');
-                                    if (audio) {
-                                        audio.play().catch(e => console.log("Audio play failed:", e));
-                                    }
+                            // Start background music if exists
+                            const audio = document.querySelector('audio');
+                            if (audio) {
+                                audio.play().catch(e => console.log("Audio play failed:", e));
+                            }
 
-                                    const youtubePlayer = document.getElementById('youtube-iframe');
-                                    if (youtubePlayer) {
-                                        youtubePlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                                    }
-                                }, 1000);
-                            }, 400);
+                            // Start YouTube video if exists
+                            const youtubePlayer = document.getElementById('youtube-iframe');
+                            if (youtubePlayer) {
+                                youtubePlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                            }
+
+                            // Initialize all other scripts
+                            initializePageScripts();
                         }
 
                         // Wait for user interaction
