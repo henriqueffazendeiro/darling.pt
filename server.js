@@ -302,10 +302,8 @@ app.use((req, res, next) => {
 // Update the route to handle both direct and wildcard access
 app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
     try {
-        // Extract sessionId from params or from the URL path
         const sessionId = req.params.sessionId || req.path.split('/').pop();
         
-        // If no sessionId is found, return 404
         if (!sessionId) {
             return res.status(404).send('Página não encontrada');
         }
@@ -414,16 +412,63 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                     #youtube-iframe{
                         margin-top: 60px;
                     }
+
+                    .loading-screen {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-color: ${theme === 'dark' ? '#1f2022' : '#ffffff'};
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 1000;
+                    }
+
+                    .loading-screen.hidden {
+                        display: none;
+                    }
+
+                    .loading-heart {
+                        color: red;
+                        font-size: 50px;
+                        animation: pulse 1s infinite;
+                    }
+
+                    .tap-to-start {
+                        margin-top: 20px;
+                        font-size: 18px;
+                        color: ${theme === 'dark' ? '#ffffff' : '#000000'};
+                    }
+
+                    @keyframes pulse {
+                        0% { transform: scale(1); }
+                        50% { transform: scale(1.2); }
+                        100% { transform: scale(1); }
+                    }
+
+                    .main-content {
+                        display: none;
+                    }
+
+                    .main-content.visible {
+                        display: block;
+                    }
                 </style>
             </head>
             <body>
-                    <div class="loading-container">
-                        <div class="heart-3d"></div>
-                    </div>
+                <div class="loading-screen">
+                    <div class="loading-heart">❤️</div>
+                    <div class="tap-to-start">Toque na tela para começar</div>
+                </div>
+
+                <div class="main-content">
+                    <!-- Your existing content here -->
                     <div id="image-slideshow"></div>
                     <span class="together-text">Juntos há</span>
                     <div class="time" id="love-time"></div>
-                   
                     <div class="preview-bubbles">
                         <div class="bubble heart-small">❤️</div>
                         <div class="bubble heart-medium">❤️</div>
@@ -577,10 +622,46 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                                 }, { once: true });
                             }
                         });
-                        
+
+                        const loadingScreen = document.querySelector('.loading-screen');
+                        const mainContent = document.querySelector('.main-content');
+
+                        function startPage() {
+                            loadingScreen.classList.add('hidden');
+                            mainContent.classList.add('visible');
+                            
+                            // Start background music if exists
+                            const audio = document.querySelector('audio');
+                            if (audio) {
+                                audio.play().catch(e => console.log("Audio play failed:", e));
+                            }
+
+                            // Start YouTube video if exists
+                            const youtubePlayer = document.getElementById('youtube-iframe');
+                            if (youtubePlayer) {
+                                youtubePlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                            }
+
+                            // Initialize all other scripts
+                            initializePageScripts();
+                        }
+
+                        // Wait for user interaction
+                        loadingScreen.addEventListener('click', startPage);
+                        loadingScreen.addEventListener('touchstart', startPage);
+
+                        function initializePageScripts() {
+                            // Your existing initialization code
+                            updateLoveTime();
+                            setInterval(updateLoveTime, 1000);
+                            triggerHeartAnimation();
+                            showNextImage();
+                            // ... rest of your initialization code ...
+                        }
                     </script>
-                </body>
-                </html>
+                </div>
+            </body>
+            </html>
         `);
     } catch (error) {
         console.error('Erro ao servir página:', error);
