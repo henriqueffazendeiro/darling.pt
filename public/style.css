@@ -319,15 +319,18 @@ h2 {
     cursor: pointer;
     position: relative;
     user-select: none;
+    gap: 20px; /* Add space between text and arrow */
 }
 
 .faq-question .arrow {
-    width: 10px;
-    height: 10px;
+    width: 8px; /* Slightly smaller arrow */
+    height: 8px;
     border-right: 2px solid #ff0000;
     border-bottom: 2px solid #ff0000;
     transform: rotate(45deg);
     transition: transform 0.3s ease;
+    flex-shrink: 0; /* Prevent arrow from shrinking */
+    margin-right: 10px; /* Add right margin to prevent cutting */
 }
 
 .faq-answer {
@@ -680,8 +683,17 @@ footer {
     }
 
     .faq-question {
-        padding: 15px 10px;
-        font-size: 16px;
+        padding: 15px 15px 15px 10px; /* Adjust padding to prevent text overflow */
+        font-size: 14px; /* Slightly smaller font on mobile */
+    }
+
+    .faq-question .arrow {
+        margin-right: 5px; /* Less margin on mobile */
+    }
+
+    .faq-question span {
+        flex: 1; /* Allow text to wrap if needed */
+        padding-right: 10px; /* Space for arrow */
     }
 
     .faq-answer {
