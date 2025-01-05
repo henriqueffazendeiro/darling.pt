@@ -266,8 +266,8 @@
                     startTime: document.getElementById('relationship-time').value,
                     message: document.getElementById('message').value,
                     files: document.getElementById('file-input').files,
-                    youtubeUrl: document.getElementById('youtube-url').value, // Updated this line
-                    theme: document.querySelector('.theme-ball.selected').classList.contains('white') ? 'light' : 'dark',
+                    youtubeUrl: document.getElementById('youtube-url').value,
+                    theme: 'dark', // Set default theme to dark
                     plan: document.querySelector('.price-option.selected').getAttribute('data-photos') === '10' ? 'premium' : 'basic'
                 };
 
