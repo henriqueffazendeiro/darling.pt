@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Pagamento Cancelado - Darling</title>
+    <link rel="icon" type="image/png" href="logo2.png">
+    <style>
+        body {
+            font-family: 'Rubik', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+
+        .cancel-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            width: 500px;
+            margin: 20px;
+        }
+
+        .cancel-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto 1rem;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        h1 {
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-retry {
+            background-color: #ff6b6b;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .btn-retry:hover {
+            background-color: #ff5252;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 2rem;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .cancel-container {
+                width: 85%;
+                padding: 1.5rem;
+                margin: 15px;
+            }
+
+            .logo {
+                width: 120px;
+                margin-bottom: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 0.8rem;
+            }
+
+            p {
+                font-size: 0.95rem;
+                margin-bottom: 1rem;
+            }
+
+            .cancel-icon {
+                width: 60px;
+                height: 60px;
+            }
+
+            .btn-retry {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+                width: 80%;
+                max-width: 250px;
+            }
+        }
+
+        @media screen and (max-width: 380px) {
+            .cancel-container {
+                width: 90%;
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.3rem;
+            }
+
+            p {
+                font-size: 0.9rem;
+            }
+
+            .cancel-icon {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cancel-container">
+        <img src="logo.png" alt="Darling Logo" class="logo">
+        <svg class="cancel-icon" viewBox="0 0 52 52">
+            <circle cx="26" cy="26" r="25" fill="none" stroke="#ff6b6b" stroke-width="2" />
+            <path fill="none" stroke="#ff6b6b" stroke-width="2" d="M16 16 36 36 M36 16 16 36" />
+        </svg>
+        <h1>Pagamento Cancelado</h1>
+        <p>O seu pagamento foi cancelado. Não se preocupe, nenhum valor foi cobrado.</p>
+        <p>Deseja tentar novamente?</p>
+        <a href="/produto.html" class="btn-retry">Tentar Novamente</a>
+    </div>
+</body>
+
+</html>
