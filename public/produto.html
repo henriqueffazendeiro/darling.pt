@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
         rel="stylesheet">
-    <title>Criar página - Darling</title>
+    <title>Document</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         .theme-ball {
@@ -35,6 +35,11 @@
         .preview-content::-webkit-scrollbar {
             display: none;
             /* Chrome, Safari and Opera */
+        }
+
+        .preview-message {
+            white-space: pre-line;
+            /* Adicione esta linha */
         }
     </style>
 </head>
@@ -326,33 +331,15 @@
 
         // Add function to validate YouTube URL
         function isValidYoutubeUrl(url) {
-            return !!getYoutubeVideoId(url);
+            const pattern = /^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/;
+            return pattern.test(url);
         }
 
         // Add these new functions after your existing script
         function getYoutubeVideoId(url) {
-            if (!url) return null;
-
-            // Remove any parameters after '&'
-            url = url.split('&')[0];
-
-            // Handle different URL formats
-            const patterns = [
-                // Standard YouTube URL
-                /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^?&]+)/,
-                // Mobile YouTube URL
-                /(?:youtube\.com\/.*[?&]v=|youtu\.be\/)([^?&]+)/,
-                // Share URL
-                /youtu\.be\/([^?&]+)/
-            ];
-
-            for (let pattern of patterns) {
-                const match = url.match(pattern);
-                if (match && match[1]) {
-                    return match[1];
-                }
-            }
-            return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
         }
 
         // Add YouTube URL input event listener
@@ -393,57 +380,13 @@
                         <iframe 
                             width="100%" 
                             height="80" 
-                            src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=1&loop=1&playlist=${videoId}&playsinline=1&enablejsapi=1" 
+                            src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=1&loop=1&playlist=${videoId}&playsinline=1" 
                             frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; playsinline" 
+                            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
                             allowfullscreen>
                         </iframe>
                     `;
                     youtubeEmbed.style.display = 'block';
-
-                    // Force iframe to be visible on mobile
-                    const iframe = youtubeEmbed.querySelector('iframe');
-                    if (iframe) {
-                        iframe.style.display = 'block';
-                        iframe.style.visibility = 'visible';
-                        iframe.style.opacity = '1';
-                    }
-                }
-            } else {
-                youtubeEmbed.style.display = 'none';
-                youtubeEmbed.innerHTML = '';
-            }
-        });
-
-        // Update the YouTube URL input event listener - remove the old one and replace with this:
-        document.getElementById('youtube-url').addEventListener('input', function (e) {
-            const youtubeUrl = e.target.value;
-            const youtubeEmbed = document.getElementById('youtube-embed');
-
-            if (isValidYoutubeUrl(youtubeUrl)) {
-                const videoId = getYoutubeVideoId(youtubeUrl);
-                if (videoId) {
-                    // Clear previous content
-                    youtubeEmbed.innerHTML = '';
-
-                    // Create iframe with mobile-friendly attributes
-                    const iframe = document.createElement('iframe');
-                    iframe.width = '100%';
-                    iframe.height = '80';
-                    iframe.style.display = 'block';
-                    iframe.style.visibility = 'visible';
-                    iframe.style.opacity = '1';
-                    iframe.style.border = 'none';
-                    iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; playsinline';
-                    iframe.allowFullscreen = true;
-                    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=1&loop=1&playlist=${videoId}&playsinline=1&enablejsapi=1`;
-
-                    // Add iframe to container
-                    youtubeEmbed.appendChild(iframe);
-                    youtubeEmbed.style.display = 'block';
-
-                    // Force layout recalculation
-                    youtubeEmbed.offsetHeight;
                 }
             } else {
                 youtubeEmbed.style.display = 'none';
@@ -504,6 +447,12 @@
             }
         }
 
+        // Atualize o event listener da mensagem
+        document.getElementById('message').addEventListener('input', function () {
+            const previewMessage = document.getElementById('preview-message');
+            previewMessage.textContent = this.value;
+            previewMessage.style.whiteSpace = 'pre-line';
+        });
     </script>
 </body>
 

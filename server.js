@@ -65,106 +65,102 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) =
     const sig = req.headers['stripe-signature'];
 
     try {
+        // Use o corpo bruto diretamente
         const event = stripe.webhooks.constructEvent(
             req.body,
             sig,
             process.env.STRIPE_ENDPOINT_SECRET
         );
 
-        // Respond immediately to Stripe
-        res.json({ received: true });
+        console.log('Evento recebido e validado:', event.type);
 
-        // Handle the event asynchronously
         if (event.type === 'checkout.session.completed') {
             const session = event.data.object;
-            const email = session.customer_details?.email;
+            console.log('Session details:', session); // Debug log
 
-            // Process email sending in the background
-            processCheckoutCompletion(session, email).catch(err => {
-                console.error('Error processing checkout completion:', err);
+            // Get email from customer_details
+            const email = session.customer_details?.email;
+            console.log('Email do cliente:', email);
+
+            if (!email) {
+                console.error('E-mail não encontrado na sessão:', session.customer_details);
+                return res.status(400).json({ error: 'E-mail não encontrado.' });
+            }
+
+            // Adicionar retry logic para esperar os dados
+            let attempts = 0;
+            const maxAttempts = 5;
+            let page = null;
+
+            while (attempts < maxAttempts) {
+                page = await Page.findOne({ sessionId: session.id });
+                if (page) break;
+                
+                console.log(`Tentativa ${attempts + 1}: Aguardando dados da página...`);
+                await new Promise(resolve => setTimeout(resolve, 0)); // Espera 2 segundos
+                attempts++;
+            }
+
+            if (!page) {
+                console.error('Página não encontrada após várias tentativas:', session.id);
+                return res.status(400).json({ error: 'Página não encontrada após várias tentativas.' });
+            }
+
+            const link = `${process.env.BASE_URL}/pagina-criada/${session.id}`;
+            console.log('Link gerado:', link);
+            
+            // Generate QR code with higher quality and larger size
+            const qrCodeDataURL = await QRCode.toDataURL(link, {
+                width: 300,
+                margin: 2,
+                errorCorrectionLevel: 'H',
+                color: {
+                    dark: '#000000',
+                    light: '#ffffff'
+                }
             });
+
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: 'Sua Página Personalizada Está Pronta!',
+                html: `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="utf-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    </head>
+                    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+                        <h1 style="color: #2c3e50; text-align: center;">Obrigado por sua compra!</h1>
+                        <p style="font-size: 16px; text-align: center;">Sua página personalizada está pronta.</p>
+                        <div style="text-align: center; margin: 30px 0;">
+                            <img src="${qrCodeDataURL}" alt="QR Code" style="width: 250px; height: 250px; display: inline-block;"/>
+                        </div>
+                        <p style="text-align: center; margin-top: 20px;">
+                            <a href="${link}" style="background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Clique aqui para acessar sua página</a>
+                        </p>
+                        <p style="text-align: center; color: #7f8c8d; margin-top: 20px;">
+                            Ou acesse diretamente este link:<br>
+                            <a href="${link}" style="color: #3498db; word-break: break-all;">${link}</a>
+                        </p>
+                    </body>
+                    </html>
+                `,
+                attachDataUrls: true // Important: enables data URL images
+            };
+
+            // Enviar email e aguardar resposta
+            const info = await transporter.sendMail(mailOptions);
+            console.log('Email enviado com sucesso:', info.response);
         }
+
+        res.json({ received: true });
     } catch (err) {
         console.error('Erro no webhook:', err.message);
-        return res.status(400).send(`Webhook Error: ${err.message}`);
+        res.status(400).send(`Webhook Error: ${err.message}`);
     }
 });
-
-// Função auxiliar para processar o checkout em background
-async function processCheckoutCompletion(session, email) {
-    if (!email) {
-        console.error('E-mail não encontrado na sessão:', session.customer_details);
-        return;
-    }
-
-    try {
-        let attempts = 0;
-        const maxAttempts = 5;
-        let page = null;
-
-        while (attempts < maxAttempts) {
-            page = await Page.findOne({ sessionId: session.id });
-            if (page) break;
-            
-            console.log(`Tentativa ${attempts + 1}: Aguardando dados da página...`);
-            await new Promise(resolve => setTimeout(resolve, 2000)); // Espera 2 segundos
-            attempts++;
-        }
-
-        if (!page) {
-            console.error('Página não encontrada após várias tentativas:', session.id);
-            return;
-        }
-
-        const link = `${process.env.BASE_URL}/pagina-criada/${session.id}`;
-        console.log('Link gerado:', link);
-        
-        const qrCodeDataURL = await QRCode.toDataURL(link, {
-            width: 300,
-            margin: 2,
-            errorCorrectionLevel: 'H',
-            color: {
-                dark: '#000000',
-                light: '#ffffff'
-            }
-        });
-
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: 'Sua Página Personalizada Está Pronta!',
-            html: `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="utf-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                </head>
-                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-                    <h1 style="color: #ff6b6b; text-align: center;">Obrigado por sua compra!</h1>
-                    <p style="font-size: 16px; text-align: center;">Sua página personalizada está pronta.</p>
-                    <div style="text-align: center; margin: 30px 0;">
-                        <img src="${qrCodeDataURL}" alt="QR Code" style="width: 250px; height: 250px; display: inline-block;"/>
-                    </div>
-                    <p style="text-align: center; margin-top: 20px;">
-                        <a href="${link}" style="background-color: #ff6b6b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Clique aqui para acessar sua página</a>
-                    </p>
-                    <p style="text-align: center; color: #7f8c8d; margin-top: 20px;">
-                        Ou acesse diretamente este link:<br>
-                        <a href="${link}" style="color: #ff6b6b; word-break: break-all;">${link}</a>
-                    </p>
-                </body>
-                </html>
-            `,
-            attachDataUrls: true // Important: enables data URL images
-        };
-
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Email enviado com sucesso:', info.response);
-    } catch (error) {
-        console.error('Erro ao processar checkout completion:', error);
-    }
-}
 
 // Middleware global para outras rotas (após o webhook)
 app.use(express.json({ limit: '50mb' }));
@@ -206,7 +202,7 @@ app.post('/create-checkout-session', async (req, res) => {
                 price_data: {
                     currency: 'eur', // Changed from 'usd' to 'eur'
                     product_data: {
-                        name: plan === 'basic' ? 'Plano Básico' : 'Plano Premium',
+                        name: `Plano ${plan.charAt(0).toUpperCase() + plan.slice(1)}`,
                     },
                     unit_amount: price,
                 },
@@ -335,69 +331,9 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
             <html>
             <head>
                 <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet">
+                <link href="/loading.css" rel="stylesheet">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <style>
-                    /* Loading screen styles */
-                    #loading-screen {
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background-color: #1f2022;
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        align-items: center;
-                        z-index: 9999;
-                    }
-
-                    .loader {
-                        position: relative;
-                        width: 40px;
-                        height: 60px;
-                        animation: heartBeat 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
-                        margin: 0 auto;
-                    }
-
-                    .loader:before, .loader:after {
-                        content: "";
-                        background: red;
-                        width: 40px;
-                        height: 60px;
-                        border-radius: 50px 50px 0 0;
-                        position: absolute;
-                        left: 0;
-                        bottom: 0;
-                        transform: rotate(45deg);
-                        transform-origin: 50% 68%;
-                        box-shadow: 5px 4px 5px #0004 inset;
-                    }
-
-                    .loader:after {
-                        transform: rotate(-45deg);
-                    }
-
-                    @keyframes heartBeat {
-                        0% { transform: scale(0.95); }
-                        5% { transform: scale(1.1); }
-                        39% { transform: scale(0.85); }
-                        45% { transform: scale(1); }
-                        60% { transform: scale(0.95); }
-                        100% { transform: scale(0.9); }
-                    }
-
-                    #loading-text {
-                        color: white;
-                        margin-top: 40px;
-                        font-family: 'Rubik', sans-serif;
-                    }
-
-                    #main-content {
-                        display: none;
-                    }
-
-                    /* Rest of your existing styles */
                     body { 
                         margin-top: 35px; 
                         font-family: 'Rubik', sans-serif; 
@@ -419,6 +355,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         word-wrap: break-word; 
                         overflow-wrap: break-word; 
                         margin-top: 15px;
+                        white-space: pre-line; /* Adicione esta linha */
                     }
                     .together-text { 
                         font-weight: bold; 
@@ -480,12 +417,6 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                 </style>
             </head>
             <body>
-                <div id="loading-screen">
-                    <div class="loader"></div>
-                    <div id="loading-text">Toque para abrir</div>
-                </div>
-
-                <div id="main-content">
                     <div class="loading-container">
                         <div class="heart-3d"></div>
                     </div>
@@ -502,7 +433,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                      <div class="preview-heart-emoji">❤️</div>
 
                     <hr class="separator">
-                    <div class="message">${message}</div>
+                    <div class="message" style="white-space: pre-line;">${message}</div>
                     ${page.pageData.youtubeUrl ? `
                         <div id="youtube-player"></div>
                         <script>
@@ -648,31 +579,8 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         });
                         
                     </script>
-                </div>
-
-                <script>
-                    // Loading screen interaction
-                    document.getElementById('loading-screen').addEventListener('click', function() {
-                        this.style.display = 'none';
-                        document.getElementById('main-content').style.display = 'block';
-                        
-                        // Start all your existing functionality
-                        updateLoveTime();
-                        showNextImage();
-                        triggerHeartAnimation();
-                        
-                        // If you have audio/YouTube, start it here
-                        if (typeof player !== 'undefined' && player.playVideo) {
-                            player.playVideo();
-                            player.unMute();
-                        }
-                    });
-
-                    // Rest of your existing scripts
-                    // ...existing scripts...
-                </script>
-            </body>
-            </html>
+                </body>
+                </html>
         `);
     } catch (error) {
         console.error('Erro ao servir página:', error);
