@@ -132,17 +132,17 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) =
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     </head>
                     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-                        <h1 style="color: #2c3e50; text-align: center;">Obrigado por sua compra!</h1>
+                        <h1 style="color: #ff6b6b; text-align: center;">Obrigado por sua compra!</h1>
                         <p style="font-size: 16px; text-align: center;">Sua página personalizada está pronta.</p>
                         <div style="text-align: center; margin: 30px 0;">
                             <img src="${qrCodeDataURL}" alt="QR Code" style="width: 250px; height: 250px; display: inline-block;"/>
                         </div>
                         <p style="text-align: center; margin-top: 20px;">
-                            <a href="${link}" style="background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Clique aqui para acessar sua página</a>
+                            <a href="${link}" style="background-color: #ff6b6b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Clique aqui para acessar sua página</a>
                         </p>
                         <p style="text-align: center; color: #7f8c8d; margin-top: 20px;">
                             Ou acesse diretamente este link:<br>
-                            <a href="${link}" style="color: #3498db; word-break: break-all;">${link}</a>
+                            <a href="${link}" style="color: #ff6b6b; word-break: break-all;">${link}</a>
                         </p>
                     </body>
                     </html>
