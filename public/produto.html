@@ -326,15 +326,33 @@
 
         // Add function to validate YouTube URL
         function isValidYoutubeUrl(url) {
-            const pattern = /^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/;
-            return pattern.test(url);
+            return !!getYoutubeVideoId(url);
         }
 
         // Add these new functions after your existing script
         function getYoutubeVideoId(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
+            if (!url) return null;
+
+            // Remove any parameters after '&'
+            url = url.split('&')[0];
+
+            // Handle different URL formats
+            const patterns = [
+                // Standard YouTube URL
+                /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^?&]+)/,
+                // Mobile YouTube URL
+                /(?:youtube\.com\/.*[?&]v=|youtu\.be\/)([^?&]+)/,
+                // Share URL
+                /youtu\.be\/([^?&]+)/
+            ];
+
+            for (let pattern of patterns) {
+                const match = url.match(pattern);
+                if (match && match[1]) {
+                    return match[1];
+                }
+            }
+            return null;
         }
 
         // Add YouTube URL input event listener
