@@ -397,6 +397,42 @@
             }
         });
 
+        // Update the YouTube URL input event listener - remove the old one and replace with this:
+        document.getElementById('youtube-url').addEventListener('input', function (e) {
+            const youtubeUrl = e.target.value;
+            const youtubeEmbed = document.getElementById('youtube-embed');
+
+            if (isValidYoutubeUrl(youtubeUrl)) {
+                const videoId = getYoutubeVideoId(youtubeUrl);
+                if (videoId) {
+                    // Clear previous content
+                    youtubeEmbed.innerHTML = '';
+
+                    // Create iframe with mobile-friendly attributes
+                    const iframe = document.createElement('iframe');
+                    iframe.width = '100%';
+                    iframe.height = '80';
+                    iframe.style.display = 'block';
+                    iframe.style.visibility = 'visible';
+                    iframe.style.opacity = '1';
+                    iframe.style.border = 'none';
+                    iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; playsinline';
+                    iframe.allowFullscreen = true;
+                    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=1&loop=1&playlist=${videoId}&playsinline=1&enablejsapi=1`;
+
+                    // Add iframe to container
+                    youtubeEmbed.appendChild(iframe);
+                    youtubeEmbed.style.display = 'block';
+
+                    // Force layout recalculation
+                    youtubeEmbed.offsetHeight;
+                }
+            } else {
+                youtubeEmbed.style.display = 'none';
+                youtubeEmbed.innerHTML = '';
+            }
+        });
+
         // Update the price selection function to show/hide YouTube input
         function selectPrice(element, maxPhotos) {
             // Clear existing selection
