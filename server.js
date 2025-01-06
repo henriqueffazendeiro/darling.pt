@@ -331,9 +331,69 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
             <html>
             <head>
                 <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet">
-                <link href="/loading.css" rel="stylesheet">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <style>
+                    /* Loading screen styles */
+                    #loading-screen {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-color: #1f2022;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 9999;
+                    }
+
+                    .loader {
+                        position: relative;
+                        width: 40px;
+                        height: 60px;
+                        animation: heartBeat 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+                        margin: 0 auto;
+                    }
+
+                    .loader:before, .loader:after {
+                        content: "";
+                        background: red;
+                        width: 40px;
+                        height: 60px;
+                        border-radius: 50px 50px 0 0;
+                        position: absolute;
+                        left: 0;
+                        bottom: 0;
+                        transform: rotate(45deg);
+                        transform-origin: 50% 68%;
+                        box-shadow: 5px 4px 5px #0004 inset;
+                    }
+
+                    .loader:after {
+                        transform: rotate(-45deg);
+                    }
+
+                    @keyframes heartBeat {
+                        0% { transform: scale(0.95); }
+                        5% { transform: scale(1.1); }
+                        39% { transform: scale(0.85); }
+                        45% { transform: scale(1); }
+                        60% { transform: scale(0.95); }
+                        100% { transform: scale(0.9); }
+                    }
+
+                    #loading-text {
+                        color: white;
+                        margin-top: 40px;
+                        font-family: 'Rubik', sans-serif;
+                    }
+
+                    #main-content {
+                        display: none;
+                    }
+
+                    /* Rest of your existing styles */
                     body { 
                         margin-top: 35px; 
                         font-family: 'Rubik', sans-serif; 
@@ -416,6 +476,12 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                 </style>
             </head>
             <body>
+                <div id="loading-screen">
+                    <div class="loader"></div>
+                    <div id="loading-text">Toque para abrir</div>
+                </div>
+
+                <div id="main-content">
                     <div class="loading-container">
                         <div class="heart-3d"></div>
                     </div>
@@ -578,8 +644,31 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         });
                         
                     </script>
-                </body>
-                </html>
+                </div>
+
+                <script>
+                    // Loading screen interaction
+                    document.getElementById('loading-screen').addEventListener('click', function() {
+                        this.style.display = 'none';
+                        document.getElementById('main-content').style.display = 'block';
+                        
+                        // Start all your existing functionality
+                        updateLoveTime();
+                        showNextImage();
+                        triggerHeartAnimation();
+                        
+                        // If you have audio/YouTube, start it here
+                        if (typeof player !== 'undefined' && player.playVideo) {
+                            player.playVideo();
+                            player.unMute();
+                        }
+                    });
+
+                    // Rest of your existing scripts
+                    // ...existing scripts...
+                </script>
+            </body>
+            </html>
         `);
     } catch (error) {
         console.error('Erro ao servir página:', error);
