@@ -141,7 +141,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) =
                             <a href="${link}" style="background-color: rgb(250, 75, 75); color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Clique aqui para acessar sua página</a>
                         </p>
                         <p style="text-align: center; color: #7f8c8d; margin-top: 20px;">
-                            Ou acesse diretamente este link:<br>
+                            Ou acesse diretamente a este link:<br>
                             <a href="${link}" style="color: rgb(250, 75, 75); word-break: break-all;">${link}</a>
                         </p>
                     </body>
