@@ -142,7 +142,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) =
                         </p>
                         <p style="text-align: center; color: #7f8c8d; margin-top: 20px;">
                             Ou acesse diretamente este link:<br>
-                            <a href="${link}" style="color: #3498db; word-break: break-all;">${link}</a>
+                            <a href="${link}" style="color: rgb(250, 75, 75); word-break: break-all;">${link}</a>
                         </p>
                     </body>
                     </html>
