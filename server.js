@@ -133,7 +133,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) =
                     </head>
                     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
                         <h1 style="color:rgb(250, 75, 75); text-align: center;">Obrigado pela sua compra!</h1>
-                        <p style="font-size: 16px; text-align: center;">Sua página personalizada está pronta.</p>
+                        <p style="font-size: 16px; text-align: center;">A sua página personalizada está pronta.</p>
                         <div style="text-align: center; margin: 30px 0;">
                             <img src="${qrCodeDataURL}" alt="QR Code" style="width: 250px; height: 250px; display: inline-block;"/>
                         </div>
