@@ -132,13 +132,13 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) =
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     </head>
                     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-                        <h1 style="color:rgb(255, 77, 77); text-align: center;">Obrigado pela sua compra!</h1>
+                        <h1 style="color:rgb(250, 75, 75); text-align: center;">Obrigado pela sua compra!</h1>
                         <p style="font-size: 16px; text-align: center;">Sua página personalizada está pronta.</p>
                         <div style="text-align: center; margin: 30px 0;">
                             <img src="${qrCodeDataURL}" alt="QR Code" style="width: 250px; height: 250px; display: inline-block;"/>
                         </div>
                         <p style="text-align: center; margin-top: 20px;">
-                            <a href="${link}" style="background-color: rgb(255, 77, 77); color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Clique aqui para acessar sua página</a>
+                            <a href="${link}" style="background-color: rgb(250, 75, 75); color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Clique aqui para acessar sua página</a>
                         </p>
                         <p style="text-align: center; color: #7f8c8d; margin-top: 20px;">
                             Ou acesse diretamente este link:<br>
@@ -331,9 +331,68 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
             <html>
             <head>
                 <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet">
-                <link href="/loading.css" rel="stylesheet">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <style>
+                    #loading-screen {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-color: #1f2022;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 9999;
+                    }
+
+                    .loader {
+                        position: relative;
+                        width: 40px;
+                        height: 60px;
+                        animation: heartBeat 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+                        margin: 0 auto;
+                    }
+
+                    .loader:before, .loader:after {
+                        content: "";
+                        background: red;
+                        width: 40px;
+                        height: 60px;
+                        border-radius: 50px 50px 0 0;
+                        position: absolute;
+                        left: 0;
+                        bottom: 0;
+                        transform: rotate(45deg);
+                        transform-origin: 50% 68%;
+                        box-shadow: 5px 4px 5px #0004 inset;
+                    }
+
+                    .loader:after {
+                        transform: rotate(-45deg);
+                    }
+
+                    @keyframes heartBeat {
+                        0% { transform: scale(0.95); }
+                        5% { transform: scale(1.1); }
+                        39% { transform: scale(0.85); }
+                        45% { transform: scale(1); }
+                        60% { transform: scale(0.95); }
+                        100% { transform: scale(0.9); }
+                    }
+
+                    #loading-text {
+                        color: white;
+                        margin-top: 40px;
+                        font-family: 'Rubik', sans-serif;
+                    }
+
+                    #main-content {
+                        display: none;
+                    }
+                    
+                    /* Rest of your existing styles */
                     body { 
                         margin-top: 35px; 
                         font-family: 'Rubik', sans-serif; 
@@ -355,6 +414,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         word-wrap: break-word; 
                         overflow-wrap: break-word; 
                         margin-top: 15px;
+                        white-space: pre-line; /* Adicione esta linha */
                     }
                     .together-text { 
                         font-weight: bold; 
@@ -416,13 +476,16 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                 </style>
             </head>
             <body>
-                    <div class="loading-container">
-                        <div class="heart-3d"></div>
-                    </div>
+                <div id="loading-screen">
+                    <div class="loader"></div>
+                    <div id="loading-text">Toque para abrir</div>
+                </div>
+
+                <div id="main-content">
+                    <!-- Your existing content -->
                     <div id="image-slideshow"></div>
                     <span class="together-text">Juntos há</span>
                     <div class="time" id="love-time"></div>
-                   
                     <div class="preview-bubbles">
                         <div class="bubble heart-small">❤️</div>
                         <div class="bubble heart-medium">❤️</div>
@@ -432,7 +495,7 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                      <div class="preview-heart-emoji">❤️</div>
 
                     <hr class="separator">
-                    <div class="message">${message}</div>
+                    <div class="message" style="white-space: pre-line;">${message}</div>
                     ${page.pageData.youtubeUrl ? `
                         <div id="youtube-player"></div>
                         <script>
@@ -508,78 +571,95 @@ app.get(['/pagina-criada/:sessionId', '/*'], async (req, res) => {
                         </script>
                     ` : ''}
 
-                    <script>
-                        // Add this to the beginning of your script section
-                        window.addEventListener('load', function() {
-                            setTimeout(function() {
-                                document.querySelector('.loading-container').classList.add('fade-out');
-                            }, 2000); // Show loading for 2 seconds
-                        });
+                </div>
 
-                        function updateLoveTime() {
-                            const startDate = new Date("${relationshipDate}T${relationshipTime}");
-                            const now = new Date();
-                            const diff = now - startDate;
-                            const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
-                            const months = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30));
-                            const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
-                            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                            document.getElementById('love-time').innerHTML = \`<strong>\${years}</strong> anos, <strong>\${months}</strong> meses, <strong>\${days}</strong> dias, <strong> <br> \${hours} </strong> horas, <strong>\${minutes}</strong> minutos, <strong>\${seconds}</strong> segundos\`;                }
-                        setInterval(updateLoveTime, 1000);
-
-                        const images = ${JSON.stringify(images)};
-                        let currentImageIndex = 0;
-                        const imageSlideshow = document.getElementById('image-slideshow');
-                        function showNextImage() {
-                            if (images.length > 0) {
-                                const img = document.createElement('img');
-                                img.src = images[currentImageIndex];
-                                imageSlideshow.innerHTML = '';
-                                imageSlideshow.appendChild(img);
-                                currentImageIndex = (currentImageIndex + 1) % images.length;
-                            }
-                        }
-                        setInterval(showNextImage, 5000);
+                <script>
+                    // Add click handler for loading screen
+                    document.getElementById('loading-screen').addEventListener('click', function() {
+                        this.style.display = 'none';
+                        document.getElementById('main-content').style.display = 'block';
+                        
+                        // Start all your existing functionality
+                        updateLoveTime();
                         showNextImage();
-
-                        function triggerHeartAnimation() {
-                            const bubbles = document.querySelectorAll('.bubble');
-                            const order = [0, 2, 1]; // Small, Large, Medium
-                            bubbles.forEach((bubble, index) => {
-                                bubble.style.animation = 'none';
-                                bubble.offsetHeight; // Trigger reflow
-                                bubble.style.animation = \`rise-bubble 5s ease-in-out forwards \${order[index] * 0.5}s\`;
-                            });
+                        triggerHeartAnimation();
+                        if (typeof player !== 'undefined' && player.playVideo) {
+                            player.playVideo();
+                            player.unMute();
                         }
+                    });
 
-                        // Trigger the animation when the page loads
-                        window.addEventListener('load', triggerHeartAnimation);
+                    // Add this to the beginning of your script section
+                    window.addEventListener('load', function() {
+                        setTimeout(function() {
+                            document.querySelector('.loading-container').classList.add('fade-out');
+                        }, 2000); // Show loading for 2 seconds
+                    });
 
-                        // Repeat the animation every 15 seconds
-                        setInterval(triggerHeartAnimation, 15000);
+                    function updateLoveTime() {
+                        const startDate = new Date("${relationshipDate}T${relationshipTime}");
+                        const now = new Date();
+                        const diff = now - startDate;
+                        const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+                        const months = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30));
+                        const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                        document.getElementById('love-time').innerHTML = \`<strong>\${years}</strong> anos, <strong>\${months}</strong> meses, <strong>\${days}</strong> dias, <strong> <br> \${hours} </strong> horas, <strong>\${minutes}</strong> minutos, <strong>\${seconds}</strong> segundos\`;                }
+                    setInterval(updateLoveTime, 1000);
+
+                    const images = ${JSON.stringify(images)};
+                    let currentImageIndex = 0;
+                    const imageSlideshow = document.getElementById('image-slideshow');
+                    function showNextImage() {
+                        if (images.length > 0) {
+                            const img = document.createElement('img');
+                            img.src = images[currentImageIndex];
+                            imageSlideshow.innerHTML = '';
+                            imageSlideshow.appendChild(img);
+                            currentImageIndex = (currentImageIndex + 1) % images.length;
+                        }
+                    }
+                    setInterval(showNextImage, 5000);
+                    showNextImage();
+
+                    function triggerHeartAnimation() {
+                        const bubbles = document.querySelectorAll('.bubble');
+                        const order = [0, 2, 1]; // Small, Large, Medium
+                        bubbles.forEach((bubble, index) => {
+                            bubble.style.animation = 'none';
+                            bubble.offsetHeight; // Trigger reflow
+                            bubble.style.animation = \`rise-bubble 5s ease-in-out forwards \${order[index] * 0.5}s\`;
+                        });
+                    }
+
+                    // Trigger the animation when the page loads
+                    window.addEventListener('load', triggerHeartAnimation);
+
+                    // Repeat the animation every 15 seconds
+                    setInterval(triggerHeartAnimation, 15000);
                         
 
-                        document.addEventListener('DOMContentLoaded', function() {
-                            const audio = document.querySelector('audio');
-                            if (audio) {
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const audio = document.querySelector('audio');
+                        if (audio) {
+                            audio.play().catch(e => console.log("Audio play failed:", e));
+                        }
+                    });
+
+                    window.addEventListener('load', function() {
+                        const audio = document.querySelector('audio');
+                        if (audio) {
+                            document.body.addEventListener('click', function() {
                                 audio.play().catch(e => console.log("Audio play failed:", e));
-                            }
-                        });
-
-                        window.addEventListener('load', function() {
-                            const audio = document.querySelector('audio');
-                            if (audio) {
-                                document.body.addEventListener('click', function() {
-                                    audio.play().catch(e => console.log("Audio play failed:", e));
-                                }, { once: true });
-                            }
-                        });
+                            }, { once: true });
+                        }
+                    });
                         
-                    </script>
-                </body>
-                </html>
+                </script>
+            </body>
+            </html>
         `);
     } catch (error) {
         console.error('Erro ao servir página:', error);
