@@ -44,6 +44,16 @@ const PageSchema = new mongoose.Schema({
 
 const Page = mongoose.model('Page', PageSchema);
 
+// Add this after existing schemas
+const DiscountSchema = new mongoose.Schema({
+    code: { type: String, required: true, unique: true },
+    percentOff: { type: Number, required: true },
+    active: { type: Boolean, default: true },
+    expiresAt: Date
+});
+
+const Discount = mongoose.model('Discount', DiscountSchema);
+
 // Add helper function at top level
 function compressImageData(imageData) {
     // Get only first 1MB of image data if too large
@@ -176,13 +186,14 @@ app.post('/create-checkout-session', async (req, res) => {
             throw new Error('Request body is invalid');
         }
 
-        const { plan, pageData } = req.body;
+        const { plan, pageData, discountCode } = req.body;
         
         console.log('Parsed data:', { 
             plan,
             pageDataExists: !!pageData,
             pageDataType: typeof pageData,
-            pageData
+            pageData,
+            discountCode
         });
 
         if (!plan || (plan !== 'basic' && plan !== 'premium')) {
@@ -193,14 +204,34 @@ app.post('/create-checkout-session', async (req, res) => {
             throw new Error('Dados da página ausentes ou inválidos.');
         }
 
-        const price = plan === 'premium' ? 999 : 499; // Changed from 1000/500 to 999/499 (cents)
+        let price = plan === 'premium' ? 999 : 499;
+        let appliedDiscount = null;
 
-        // Create Stripe session
-        const session = await stripe.checkout.sessions.create({
+        // Check for valid discount code
+        if (discountCode) {
+            const discount = await Discount.findOne({
+                code: discountCode,
+                active: true,
+                expiresAt: { $gt: new Date() }
+            });
+
+            if (discount) {
+                appliedDiscount = {
+                    type: 'coupon',
+                    coupon: await stripe.coupons.create({
+                        percent_off: discount.percentOff,
+                        duration: 'once',
+                    })
+                };
+            }
+        }
+
+        // Create Stripe session with discount if applicable
+        const sessionConfig = {
             payment_method_types: ['card'],
             line_items: [{
                 price_data: {
-                    currency: 'eur', // Changed from 'usd' to 'eur'
+                    currency: 'eur',
                     product_data: {
                         name: `Plano ${plan.charAt(0).toUpperCase() + plan.slice(1)}`,
                     },
@@ -211,7 +242,14 @@ app.post('/create-checkout-session', async (req, res) => {
             mode: 'payment',
             success_url: `${process.env.BASE_URL}/success.html`,
             cancel_url: `${process.env.BASE_URL}/cancel.html`,
-        });
+        };
+
+        // Apply discount if valid
+        if (appliedDiscount) {
+            sessionConfig.discounts = [appliedDiscount];
+        }
+
+        const session = await stripe.checkout.sessions.create(sessionConfig);
 
         console.log('Stripe session created:', session.id);
 
@@ -688,6 +726,49 @@ app.post('/checkout-success', async (req, res) => {
     const pageId = result.insertedId;
     
     res.redirect(`/couples/${pageId}`);
+});
+
+// Add new route to validate discount codes
+app.post('/validate-discount', async (req, res) => {
+    try {
+        const { code } = req.body;
+        const discount = await Discount.findOne({
+            code,
+            active: true,
+            expiresAt: { $gt: new Date() }
+        });
+
+        if (discount) {
+            res.json({
+                valid: true,
+                percentOff: discount.percentOff
+            });
+        } else {
+            res.json({
+                valid: false,
+                message: 'Código de desconto inválido ou expirado'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Create admin route to add discount codes (protect this in production!)
+app.post('/admin/create-discount', async (req, res) => {
+    try {
+        const fullDiscount = new Discount({
+            code: 'FREE100',  // you can change this code
+            percentOff: 100,
+            active: true,
+            expiresAt: new Date('2024-12-31')  // set expiration date
+        });
+        
+        await fullDiscount.save();
+        res.json({ success: true, message: 'Discount code created successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 // Inicia o servidor
