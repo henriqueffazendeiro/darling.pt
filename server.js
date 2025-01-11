@@ -187,7 +187,7 @@ app.post('/create-checkout-session', async (req, res) => {
             throw new Error('Request body is invalid');
         }
 
-        const { plan, pageData, discountCode } = req.body;
+        const { plan, pageData } = req.body;
         
         if (!plan || (plan !== 'basic' && plan !== 'premium')) {
             throw new Error('Plano inválido ou ausente.');
@@ -202,7 +202,7 @@ app.post('/create-checkout-session', async (req, res) => {
         // Create Stripe session configuration
         const sessionConfig = {
             payment_method_types: ['card'],
-            allow_promotion_codes: true,  // Permite códigos promocionais
+            allow_promotion_codes: true,  // Only this line for promotions
             line_items: [{
                 price_data: {
                     currency: 'eur',
