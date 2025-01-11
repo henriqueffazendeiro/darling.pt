@@ -758,6 +758,29 @@ app.post('/admin/create-discount', async (req, res) => {
     }
 });
 
+// Create and manage promotion codes
+app.post('/admin/create-promotion', async (req, res) => {
+    try {
+        // First, create a coupon
+        const coupon = await stripe.coupons.create({
+            percent_off: 100,
+            duration: 'once',
+        });
+
+        // Then create a promotion code that uses this coupon
+        const promotionCode = await stripe.promotionCodes.create({
+            coupon: coupon.id,
+            code: 'FREE100',
+            max_redemptions: 9999,
+        });
+
+        res.json({ success: true, promotionCode });
+    } catch (error) {
+        console.error('Error creating promotion code:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Inicia o servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
