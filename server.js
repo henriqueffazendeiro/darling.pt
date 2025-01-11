@@ -178,7 +178,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static('public'));
 
-// Rota para criar sessão de checkout do Stripe
+// Simplify checkout session to use existing coupon
 app.post('/create-checkout-session', async (req, res) => {
     try {
         console.log('Raw request body:', req.body);
@@ -214,16 +214,12 @@ app.post('/create-checkout-session', async (req, res) => {
                 quantity: 1,
             }],
             mode: 'payment',
+            discounts: [{
+                coupon: 'FREE100',
+            }],
             success_url: `${process.env.BASE_URL}/success.html`,
             cancel_url: `${process.env.BASE_URL}/cancel.html`,
         };
-
-        // Apply discount if valid
-        if (discountCode === 'FREE100') {
-            sessionConfig.discounts = [{
-                coupon: 'FREE100'
-            }];
-        }
 
         const session = await stripe.checkout.sessions.create(sessionConfig);
 
