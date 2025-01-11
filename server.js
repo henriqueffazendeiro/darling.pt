@@ -202,7 +202,6 @@ app.post('/create-checkout-session', async (req, res) => {
         // Create Stripe session configuration
         const sessionConfig = {
             payment_method_types: ['card'],
-            allow_promotion_codes: true,
             line_items: [{
                 price_data: {
                     currency: 'eur',
@@ -215,7 +214,7 @@ app.post('/create-checkout-session', async (req, res) => {
             }],
             mode: 'payment',
             discounts: [{
-                coupon: 'FREE100',
+                coupon: 'FREE100'
             }],
             success_url: `${process.env.BASE_URL}/success.html`,
             cancel_url: `${process.env.BASE_URL}/cancel.html`,
