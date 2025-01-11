@@ -49,7 +49,8 @@ const DiscountSchema = new mongoose.Schema({
     code: { type: String, required: true, unique: true },
     percentOff: { type: Number, required: true },
     active: { type: Boolean, default: true },
-    expiresAt: Date
+    expiresAt: Date,
+    stripeId: String
 });
 
 const Discount = mongoose.model('Discount', DiscountSchema);
@@ -188,14 +189,6 @@ app.post('/create-checkout-session', async (req, res) => {
 
         const { plan, pageData, discountCode } = req.body;
         
-        console.log('Parsed data:', { 
-            plan,
-            pageDataExists: !!pageData,
-            pageDataType: typeof pageData,
-            pageData,
-            discountCode
-        });
-
         if (!plan || (plan !== 'basic' && plan !== 'premium')) {
             throw new Error('Plano inválido ou ausente.');
         }
@@ -205,31 +198,11 @@ app.post('/create-checkout-session', async (req, res) => {
         }
 
         let price = plan === 'premium' ? 999 : 499;
-        let appliedDiscount = null;
 
-        // Check for valid discount code
-        if (discountCode) {
-            const discount = await Discount.findOne({
-                code: discountCode,
-                active: true,
-                expiresAt: { $gt: new Date() }
-            });
-
-            if (discount) {
-                appliedDiscount = {
-                    type: 'coupon',
-                    coupon: await stripe.coupons.create({
-                        percent_off: discount.percentOff,
-                        duration: 'once',
-                    })
-                };
-            }
-        }
-
-        // Create Stripe session with discount if applicable
+        // Create Stripe session configuration
         const sessionConfig = {
             payment_method_types: ['card'],
-            allow_promotion_codes: true, // Add this line to enable promotion code field
+            allow_promotion_codes: true,
             line_items: [{
                 price_data: {
                     currency: 'eur',
@@ -245,22 +218,24 @@ app.post('/create-checkout-session', async (req, res) => {
             cancel_url: `${process.env.BASE_URL}/cancel.html`,
         };
 
-        // Apply discount if valid
-        if (appliedDiscount) {
-            sessionConfig.discounts = [appliedDiscount];
+        // Check for valid discount code
+        if (discountCode) {
+            const discount = await Discount.findOne({
+                code: discountCode,
+                active: true,
+                expiresAt: { $gt: new Date() }
+            });
+
+            if (discount) {
+                sessionConfig.discounts = [{
+                    coupon: discount.stripeId
+                }];
+            }
         }
 
         const session = await stripe.checkout.sessions.create(sessionConfig);
 
-        console.log('Stripe session created:', session.id);
-
-        // Compress images before saving
-        let compressedImages = [];
-        if (pageData.images && Array.isArray(pageData.images)) {
-            compressedImages = pageData.images.map(img => compressImageData(img));
-        }
-
-        // Save page data with compressed images
+        // Save page data
         const page = new Page({
             sessionId: session.id,
             pageData: {
@@ -268,7 +243,7 @@ app.post('/create-checkout-session', async (req, res) => {
                 startDate: pageData.startDate,
                 message: pageData.message,
                 theme: pageData.theme,
-                images: compressedImages,
+                images: pageData.images?.map(img => compressImageData(img)) || [],
                 youtubeUrl: compressImageData(pageData.youtubeUrl)
             }
         });
@@ -758,7 +733,7 @@ app.post('/validate-discount', async (req, res) => {
 // Modify the admin route to create discount in both MongoDB and Stripe
 app.post('/admin/create-discount', async (req, res) => {
     try {
-        // Create coupon in Stripe first
+        // First create the coupon in Stripe
         const stripeCoupon = await stripe.coupons.create({
             name: 'FREE100',
             id: 'FREE100',
@@ -766,7 +741,7 @@ app.post('/admin/create-discount', async (req, res) => {
             duration: 'once',
         });
 
-        // Then create in MongoDB
+        // Then save in MongoDB
         const fullDiscount = new Discount({
             code: 'FREE100',
             percentOff: 100,
@@ -776,13 +751,13 @@ app.post('/admin/create-discount', async (req, res) => {
         });
         
         await fullDiscount.save();
+        
         res.json({ 
             success: true, 
-            message: 'Discount code created successfully in both Stripe and MongoDB',
+            message: 'Discount code created successfully',
             coupon: stripeCoupon
         });
     } catch (error) {
-        // If error occurs, try to clean up any created resources
         if (error.stripeId) {
             try {
                 await stripe.coupons.del(error.stripeId);
@@ -790,40 +765,6 @@ app.post('/admin/create-discount', async (req, res) => {
                 console.error('Error deleting Stripe coupon:', deleteError);
             }
         }
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Modify checkout session to use existing Stripe coupon
-app.post('/create-checkout-session', async (req, res) => {
-    try {
-        // ...existing validation code...
-
-        const sessionConfig = {
-            payment_method_types: ['card'],
-            allow_promotion_codes: true,
-            // ...rest of your session config...
-        };
-
-        // If there's a discount code, look it up and apply it
-        if (discountCode) {
-            const discount = await Discount.findOne({
-                code: discountCode,
-                active: true,
-                expiresAt: { $gt: new Date() }
-            });
-
-            if (discount) {
-                sessionConfig.discounts = [{
-                    coupon: discountCode
-                }];
-            }
-        }
-
-        const session = await stripe.checkout.sessions.create(sessionConfig);
-        // ...rest of your code...
-    } catch (error) {
-        console.error('Checkout session error:', error);
         res.status(500).json({ error: error.message });
     }
 });
