@@ -229,6 +229,7 @@ app.post('/create-checkout-session', async (req, res) => {
         // Create Stripe session with discount if applicable
         const sessionConfig = {
             payment_method_types: ['card'],
+            allow_promotion_codes: true, // Add this line to enable promotion code field
             line_items: [{
                 price_data: {
                     currency: 'eur',
