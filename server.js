@@ -755,19 +755,75 @@ app.post('/validate-discount', async (req, res) => {
     }
 });
 
-// Create admin route to add discount codes (protect this in production!)
+// Modify the admin route to create discount in both MongoDB and Stripe
 app.post('/admin/create-discount', async (req, res) => {
     try {
+        // Create coupon in Stripe first
+        const stripeCoupon = await stripe.coupons.create({
+            name: 'FREE100',
+            id: 'FREE100',
+            percent_off: 100,
+            duration: 'once',
+        });
+
+        // Then create in MongoDB
         const fullDiscount = new Discount({
-            code: 'FREE100',  // you can change this code
+            code: 'FREE100',
             percentOff: 100,
             active: true,
-            expiresAt: new Date('2024-12-31')  // set expiration date
+            expiresAt: new Date('2024-12-31'),
+            stripeId: stripeCoupon.id
         });
         
         await fullDiscount.save();
-        res.json({ success: true, message: 'Discount code created successfully' });
+        res.json({ 
+            success: true, 
+            message: 'Discount code created successfully in both Stripe and MongoDB',
+            coupon: stripeCoupon
+        });
     } catch (error) {
+        // If error occurs, try to clean up any created resources
+        if (error.stripeId) {
+            try {
+                await stripe.coupons.del(error.stripeId);
+            } catch (deleteError) {
+                console.error('Error deleting Stripe coupon:', deleteError);
+            }
+        }
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Modify checkout session to use existing Stripe coupon
+app.post('/create-checkout-session', async (req, res) => {
+    try {
+        // ...existing validation code...
+
+        const sessionConfig = {
+            payment_method_types: ['card'],
+            allow_promotion_codes: true,
+            // ...rest of your session config...
+        };
+
+        // If there's a discount code, look it up and apply it
+        if (discountCode) {
+            const discount = await Discount.findOne({
+                code: discountCode,
+                active: true,
+                expiresAt: { $gt: new Date() }
+            });
+
+            if (discount) {
+                sessionConfig.discounts = [{
+                    coupon: discountCode
+                }];
+            }
+        }
+
+        const session = await stripe.checkout.sessions.create(sessionConfig);
+        // ...rest of your code...
+    } catch (error) {
+        console.error('Checkout session error:', error);
         res.status(500).json({ error: error.message });
     }
 });
