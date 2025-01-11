@@ -218,19 +218,11 @@ app.post('/create-checkout-session', async (req, res) => {
             cancel_url: `${process.env.BASE_URL}/cancel.html`,
         };
 
-        // Check for valid discount code
-        if (discountCode) {
-            const discount = await Discount.findOne({
-                code: discountCode,
-                active: true,
-                expiresAt: { $gt: new Date() }
-            });
-
-            if (discount) {
-                sessionConfig.discounts = [{
-                    coupon: discount.stripeId
-                }];
-            }
+        // Apply discount if valid
+        if (discountCode === 'FREE100') {
+            sessionConfig.discounts = [{
+                coupon: 'FREE100'
+            }];
         }
 
         const session = await stripe.checkout.sessions.create(sessionConfig);
@@ -730,24 +722,34 @@ app.post('/validate-discount', async (req, res) => {
     }
 });
 
-// Modify the admin route to create discount in both MongoDB and Stripe
+// Update create-discount route
 app.post('/admin/create-discount', async (req, res) => {
     try {
-        // First create the coupon in Stripe
+        // First delete existing coupon if it exists
+        try {
+            await stripe.coupons.del('FREE100');
+        } catch (err) {
+            console.log('No existing coupon to delete');
+        }
+
+        // Create new coupon in Stripe
         const stripeCoupon = await stripe.coupons.create({
-            name: 'FREE100',
             id: 'FREE100',
+            duration: 'forever',
             percent_off: 100,
-            duration: 'once',
+            max_redemptions: 999999,
         });
 
-        // Then save in MongoDB
+        // Delete any existing discount in MongoDB
+        await Discount.deleteMany({ code: 'FREE100' });
+
+        // Create new discount in MongoDB
         const fullDiscount = new Discount({
             code: 'FREE100',
             percentOff: 100,
             active: true,
             expiresAt: new Date('2024-12-31'),
-            stripeId: stripeCoupon.id
+            stripeId: 'FREE100'
         });
         
         await fullDiscount.save();
@@ -758,13 +760,7 @@ app.post('/admin/create-discount', async (req, res) => {
             coupon: stripeCoupon
         });
     } catch (error) {
-        if (error.stripeId) {
-            try {
-                await stripe.coupons.del(error.stripeId);
-            } catch (deleteError) {
-                console.error('Error deleting Stripe coupon:', deleteError);
-            }
-        }
+        console.error('Error creating discount:', error);
         res.status(500).json({ error: error.message });
     }
 });
