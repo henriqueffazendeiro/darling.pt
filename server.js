@@ -199,12 +199,10 @@ app.post('/create-checkout-session', async (req, res) => {
 
         let price = plan === 'premium' ? 999 : 499;
 
-        // Modificar a configuração da sessão para incluir o cupom específico
+        // Modificar a configuração da sessão para permitir entrada manual do cupom
         const sessionConfig = {
             payment_method_types: ['card'],
-            discounts: [{
-                coupon: 'TSMqEXVi',  // ID específico do cupom
-            }],
+            allow_promotion_codes: true,  // Apenas esta linha é necessária para cupons
             line_items: [{
                 price_data: {
                     currency: 'eur',
