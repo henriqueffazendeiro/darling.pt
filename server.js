@@ -199,10 +199,15 @@ app.post('/create-checkout-session', async (req, res) => {
 
         let price = plan === 'premium' ? 999 : 499;
 
-        // Modificar a configuração da sessão para permitir entrada manual do cupom
+        // Adicionar logs para debug
+        console.log('Criando sessão de checkout com configuração:');
+        
         const sessionConfig = {
             payment_method_types: ['card'],
-            allow_promotion_codes: true,  // Apenas esta linha é necessária para cupons
+            allow_promotion_codes: true,
+            metadata: {
+                promo_code_allowed: 'true'  // Adiciona metadata para confirmar promoção permitida
+            },
             line_items: [{
                 price_data: {
                     currency: 'eur',
@@ -218,7 +223,11 @@ app.post('/create-checkout-session', async (req, res) => {
             cancel_url: `${process.env.BASE_URL}/cancel.html`,
         };
 
+        console.log('Session Config:', sessionConfig);
+
         const session = await stripe.checkout.sessions.create(sessionConfig);
+        console.log('Sessão criada:', session.id);
+        console.log('Promoções permitidas:', session.allow_promotion_codes);
 
         // Save page data
         const page = new Page({
@@ -239,7 +248,10 @@ app.post('/create-checkout-session', async (req, res) => {
         res.json({ id: session.id, url: session.url });
     } catch (error) {
         console.error('Checkout session error:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ 
+            error: error.message,
+            details: error.code || 'Erro desconhecido'
+        });
     }
 });
 
