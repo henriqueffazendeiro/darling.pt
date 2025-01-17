@@ -199,11 +199,12 @@ app.post('/create-checkout-session', async (req, res) => {
 
         let price = plan === 'premium' ? 999 : 499;
 
-        // Create Stripe session configuration
+        // Modificar a configuração da sessão para incluir o cupom específico
         const sessionConfig = {
             payment_method_types: ['card'],
-            allow_promotion_codes: true,  // Isso já permite o uso de cupons
-            discounts: [], // Adiciona suporte explícito para descontos
+            discounts: [{
+                coupon: 'TSMqEXVi',  // ID específico do cupom
+            }],
             line_items: [{
                 price_data: {
                     currency: 'eur',
