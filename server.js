@@ -187,7 +187,7 @@ app.post('/create-checkout-session', async (req, res) => {
             throw new Error('Request body is invalid');
         }
 
-        const { plan, pageData } = req.body;
+        const { plan, pageData, promoCode } = req.body;
         
         if (!plan || (plan !== 'basic' && plan !== 'premium')) {
             throw new Error('Plano inválido ou ausente.');
@@ -199,15 +199,8 @@ app.post('/create-checkout-session', async (req, res) => {
 
         let price = plan === 'premium' ? 999 : 499;
 
-        // Adicionar logs para debug
-        console.log('Criando sessão de checkout com configuração:');
-        
         const sessionConfig = {
             payment_method_types: ['card'],
-            allow_promotion_codes: true,
-            metadata: {
-                promo_code_allowed: 'true'  // Adiciona metadata para confirmar promoção permitida
-            },
             line_items: [{
                 price_data: {
                     currency: 'eur',
@@ -221,14 +214,26 @@ app.post('/create-checkout-session', async (req, res) => {
             mode: 'payment',
             success_url: `${process.env.BASE_URL}/success.html`,
             cancel_url: `${process.env.BASE_URL}/cancel.html`,
+            allow_promotion_codes: true
         };
 
-        console.log('Session Config:', sessionConfig);
+        // If a promo code was provided, validate and apply it
+        if (promoCode) {
+            const discount = await Discount.findOne({
+                code: promoCode,
+                active: true,
+                expiresAt: { $gt: new Date() }
+            });
+
+            if (discount) {
+                sessionConfig.discounts = [{
+                    coupon: discount.stripeId,
+                }];
+            }
+        }
 
         const session = await stripe.checkout.sessions.create(sessionConfig);
-        console.log('Sessão criada:', session.id);
-        console.log('Promoções permitidas:', session.allow_promotion_codes);
-
+        
         // Save page data
         const page = new Page({
             sessionId: session.id,
@@ -243,7 +248,6 @@ app.post('/create-checkout-session', async (req, res) => {
         });
 
         await page.save();
-        console.log('Page data saved with sessionId:', session.id);
 
         res.json({ id: session.id, url: session.url });
     } catch (error) {
@@ -789,6 +793,48 @@ app.post('/admin/create-promotion', async (req, res) => {
         res.json({ success: true, promotionCode });
     } catch (error) {
         console.error('Error creating promotion code:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Add route to create a 100% discount promotional code for content creators
+app.post('/admin/create-content-creator-promo', async (req, res) => {
+    try {
+        const { code, maxRedemptions, expiresAt } = req.body;
+
+        // Create coupon in Stripe
+        const stripeCoupon = await stripe.coupons.create({
+            percent_off: 100,
+            duration: 'once',
+            max_redemptions: maxRedemptions,
+            expires_at: new Date(expiresAt).getTime() / 1000
+        });
+
+        // Create promotion code that uses this coupon
+        const stripePromoCode = await stripe.promotionCodes.create({
+            coupon: stripeCoupon.id,
+            code: code,
+            max_redemptions: maxRedemptions
+        });
+
+        // Save to MongoDB
+        const discount = new Discount({
+            code: code,
+            percentOff: 100,
+            active: true,
+            expiresAt: new Date(expiresAt),
+            stripeId: stripeCoupon.id
+        });
+
+        await discount.save();
+
+        res.json({
+            success: true,
+            message: 'Código promocional de 100% criado com sucesso',
+            promoCode: stripePromoCode
+        });
+    } catch (error) {
+        console.error('Error creating promotional code:', error);
         res.status(500).json({ error: error.message });
     }
 });
