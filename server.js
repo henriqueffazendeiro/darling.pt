@@ -844,3 +844,18 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
+
+fetch('http://localhost:3000/admin/create-content-creator-promo', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        code: 'CREATOR100',
+        maxRedemptions: 100,
+        expiresAt: '2024-12-31'
+    })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));
