@@ -187,7 +187,7 @@ app.post('/create-checkout-session', async (req, res) => {
             throw new Error('Request body is invalid');
         }
 
-        const { plan, pageData } = req.body;
+        const { plan, pageData, promotionCode } = req.body;
         
         if (!plan || (plan !== 'basic' && plan !== 'premium')) {
             throw new Error('Plano inválido ou ausente.');
@@ -221,6 +221,7 @@ app.post('/create-checkout-session', async (req, res) => {
             mode: 'payment',
             success_url: `${process.env.BASE_URL}/success.html`,
             cancel_url: `${process.env.BASE_URL}/cancel.html`,
+            discounts: promotionCode ? [{ promotion_code: promotionCode }] : [],
         };
 
         console.log('Session Config:', sessionConfig);
@@ -789,6 +790,38 @@ app.post('/admin/create-promotion', async (req, res) => {
         res.json({ success: true, promotionCode });
     } catch (error) {
         console.error('Error creating promotion code:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Add new route to generate unique promotion codes for content creators
+app.post('/admin/generate-promotion-code', async (req, res) => {
+    try {
+        const { creatorName } = req.body;
+
+        if (!creatorName) {
+            return res.status(400).json({ error: 'Creator name is required' });
+        }
+
+        // Generate a unique code based on the creator's name
+        const uniqueCode = `${creatorName.toUpperCase()}-${Date.now()}`;
+
+        // Create a coupon in Stripe
+        const coupon = await stripe.coupons.create({
+            percent_off: 100,
+            duration: 'once',
+        });
+
+        // Create a promotion code that uses this coupon
+        const promotionCode = await stripe.promotionCodes.create({
+            coupon: coupon.id,
+            code: uniqueCode,
+            max_redemptions: 1,
+        });
+
+        res.json({ success: true, promotionCode });
+    } catch (error) {
+        console.error('Error generating promotion code:', error);
         res.status(500).json({ error: error.message });
     }
 });
