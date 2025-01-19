@@ -802,6 +802,8 @@ app.post('/admin/create-content-creator-promo', async (req, res) => {
     try {
         const { code, maxRedemptions, expiresAt } = req.body;
 
+        console.log('Creating promo code with:', { code, maxRedemptions, expiresAt });
+
         // Create coupon in Stripe
         const stripeCoupon = await stripe.coupons.create({
             percent_off: 100,
@@ -810,12 +812,16 @@ app.post('/admin/create-content-creator-promo', async (req, res) => {
             expires_at: new Date(expiresAt).getTime() / 1000
         });
 
+        console.log('Stripe coupon created:', stripeCoupon);
+
         // Create promotion code that uses this coupon
         const stripePromoCode = await stripe.promotionCodes.create({
             coupon: stripeCoupon.id,
             code: code,
             max_redemptions: maxRedemptions
         });
+
+        console.log('Stripe promotion code created:', stripePromoCode);
 
         // Save to MongoDB
         const discount = new Discount({
@@ -828,6 +834,8 @@ app.post('/admin/create-content-creator-promo', async (req, res) => {
 
         await discount.save();
 
+        console.log('Discount saved to MongoDB:', discount);
+
         res.json({
             success: true,
             message: 'Código promocional de 100% criado com sucesso',
@@ -835,6 +843,38 @@ app.post('/admin/create-content-creator-promo', async (req, res) => {
         });
     } catch (error) {
         console.error('Error creating promotional code:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Add route to validate promo codes
+app.post('/validate-promo-code', async (req, res) => {
+    try {
+        const { code } = req.body;
+        
+        console.log('Validating promo code:', code);
+
+        const discount = await Discount.findOne({
+            code: code,
+            active: true,
+            expiresAt: { $gt: new Date() }
+        });
+
+        if (discount) {
+            console.log('Promo code is valid:', discount);
+            res.json({
+                valid: true,
+                percentOff: discount.percentOff
+            });
+        } else {
+            console.log('Promo code is invalid or expired:', code);
+            res.json({
+                valid: false,
+                message: 'Código promocional inválido ou expirado'
+            });
+        }
+    } catch (error) {
+        console.error('Error validating promo code:', error);
         res.status(500).json({ error: error.message });
     }
 });
